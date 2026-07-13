@@ -1,5 +1,6 @@
 'use client'
 
+import { ShieldCheck, FileText, History, PhoneCall, Apple, Sparkles } from 'lucide-react'
 import { Reveal, Stagger, StaggerItem } from './reveal'
 
 function ScreenRow({
@@ -39,7 +40,7 @@ function Screen({
   children: React.ReactNode
 }) {
   return (
-    <div className="rounded-xl border border-border bg-background p-4">
+    <div className="rounded-xl border border-border bg-background p-4 shadow-[0_4px_16px_rgba(0,0,0,0.02)]">
       <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
         {title}
       </p>
@@ -52,6 +53,9 @@ const benefits = [
   {
     title: 'Medication Safety',
     desc: 'Every new medicine is checked against everything you already take.',
+    icon: ShieldCheck,
+    isWide: true,
+    colSpan: 'lg:col-span-4',
     screen: (
       <Screen title="Interaction check">
         <ScreenRow label="Amoxicillin" value="Blocked · allergy" tone="danger" />
@@ -62,7 +66,10 @@ const benefits = [
   },
   {
     title: 'Report Intelligence',
-    desc: 'Upload any report. Medhee reads it, tracks it and remembers it.',
+    desc: 'Upload any report. Medhee reads, tracks, and recalls it.',
+    icon: FileText,
+    isWide: false,
+    colSpan: 'lg:col-span-2',
     screen: (
       <Screen title="Blood panel · trend">
         <ScreenRow label="HbA1c" value="7.4 → 6.8%" tone="success" />
@@ -74,6 +81,9 @@ const benefits = [
   {
     title: 'Health Memory',
     desc: 'Your complete history, organized into one living timeline.',
+    icon: History,
+    isWide: false,
+    colSpan: 'lg:col-span-2',
     screen: (
       <Screen title="Timeline">
         <ScreenRow label="Feb 12" value="Consultation · Dr. Mehta" />
@@ -85,6 +95,9 @@ const benefits = [
   {
     title: 'Doctor On Call',
     desc: 'When risk rises, a verified doctor joins with your full context.',
+    icon: PhoneCall,
+    isWide: true,
+    colSpan: 'lg:col-span-4',
     screen: (
       <Screen title="Consultation">
         <ScreenRow label="Dr. Mehta" value="Joining now" tone="success" />
@@ -96,6 +109,9 @@ const benefits = [
   {
     title: 'Personal Diet',
     desc: 'Guidance that accounts for your conditions, not generic advice.',
+    icon: Apple,
+    isWide: false,
+    colSpan: 'lg:col-span-3',
     screen: (
       <Screen title="Today's plan">
         <ScreenRow label="Breakfast" value="Low glycemic" tone="success" />
@@ -107,6 +123,9 @@ const benefits = [
   {
     title: 'AI Triage',
     desc: 'Instant risk assessment grounded in your real medical history.',
+    icon: Sparkles,
+    isWide: false,
+    colSpan: 'lg:col-span-3',
     screen: (
       <Screen title="Assessment">
         <ScreenRow label="Symptom" value="Vomiting" />
@@ -130,20 +149,42 @@ export function Benefits() {
           </h2>
         </Reveal>
 
-        <Stagger className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" gap={0.1}>
-          {benefits.map((benefit) => (
-            <StaggerItem key={benefit.title}>
-              <article className="flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-[0_8px_30px_rgba(17,17,17,0.04)] transition-shadow hover:shadow-[0_12px_40px_rgba(17,17,17,0.08)]">
-                <h3 className="text-lg font-semibold tracking-tight">
-                  {benefit.title}
-                </h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                  {benefit.desc}
-                </p>
-                <div className="mt-5">{benefit.screen}</div>
-              </article>
-            </StaggerItem>
-          ))}
+        <Stagger className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-6" gap={0.08}>
+          {benefits.map((benefit) => {
+            const Icon = benefit.icon
+            return (
+              <StaggerItem key={benefit.title} className={`${benefit.colSpan} sm:col-span-1`}>
+                <article className="group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-[0_8px_30px_rgba(17,17,17,0.02)] transition-all duration-300 hover:border-primary/20 hover:shadow-[0_12px_40px_rgba(14,107,82,0.04)]">
+                  {/* Soft background glow on hover */}
+                  <div className="pointer-events-none absolute -inset-px z-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100" 
+                    style={{
+                      background: 'radial-gradient(ellipse 50% 50% at 50% 100%, rgba(14,107,82,0.03), transparent)'
+                    }}
+                  />
+                  
+                  <div className="relative z-10 flex h-full flex-col justify-between">
+                    <div className={benefit.isWide ? 'lg:flex lg:flex-row lg:items-start lg:justify-between lg:gap-8' : ''}>
+                      <div className={benefit.isWide ? 'lg:max-w-xs' : ''}>
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/8 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                          <Icon className="h-5 w-5" />
+                        </div>
+                        <h3 className="mt-4 text-lg font-semibold tracking-tight">
+                          {benefit.title}
+                        </h3>
+                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                          {benefit.desc}
+                        </p>
+                      </div>
+                      
+                      <div className={`mt-6 ${benefit.isWide ? 'lg:mt-0 lg:w-[260px] shrink-0' : 'w-full'}`}>
+                        {benefit.screen}
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              </StaggerItem>
+            )
+          })}
         </Stagger>
       </div>
     </section>

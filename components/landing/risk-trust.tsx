@@ -7,47 +7,44 @@ import { easeCalm } from './reveal'
 const risks = [
   {
     level: 'Low risk',
-    action: 'AI helps',
-    desc: 'Safe guidance grounded in your history — hydration, monitoring, when to check back.',
-    dot: 'bg-success',
-    ring: 'border-border',
+    action: 'AI-Guided Support',
+    desc: 'Safe, baseline guidance grounded in your medical history—hydration, sleep tracking, symptoms monitoring, and when to follow up.',
+    colorClass: 'from-emerald-400 to-teal-500',
   },
   {
     level: 'Moderate risk',
-    action: 'Doctor recommended',
-    desc: 'Medhee suggests a consultation and prepares your full context in advance.',
-    dot: 'bg-warning',
-    ring: 'border-warning/40',
+    action: 'Doctor Consultation',
+    desc: 'Medhee advises connection to an on-call physician and bundles your complete reports history and symptoms chronology to share automatically.',
+    colorClass: 'from-amber-400 to-orange-500',
   },
   {
     level: 'High risk',
-    action: 'Immediate consultation',
-    desc: 'A verified doctor is connected instantly, with your complete profile already shared.',
-    dot: 'bg-danger',
-    ring: 'border-danger/40',
+    action: 'Urgent Care Routing',
+    desc: 'Bypasses autonomous triage. Flags immediate connection to a verified medical professional with instant automated priority care coordination.',
+    colorClass: 'from-rose-400 to-red-500',
   },
 ]
 
 const trust = [
   {
     title: 'End-to-end encryption',
-    desc: 'Your health data is encrypted in transit and at rest.',
+    desc: 'Your private health log, history records, and physician chats are fully encrypted in transit and at rest.',
   },
   {
     title: 'Privacy by default',
-    desc: 'Your data is never sold. You control what is shared, always.',
+    desc: 'We never sell your healthcare records. You control who views your reports and when permissions expire.',
   },
   {
     title: 'Verified doctors',
-    desc: 'Every doctor on Medhee is licensed and identity-verified.',
+    desc: 'Every consulting physician undergoes background screening and active State Medical Council registry validation.',
   },
   {
     title: 'DPDP compliant',
-    desc: 'Built to meet the Digital Personal Data Protection Act.',
+    desc: 'Fully architected to meet data protection guidelines specified in the Digital Personal Data Protection Act.',
   },
   {
     title: 'Medical AI safeguards',
-    desc: 'The AI defers to doctors whenever risk is uncertain.',
+    desc: 'The model has strict clinical guardrails and defers triage entirely to doctors whenever symptom classification is ambiguous.',
   },
 ]
 
@@ -68,18 +65,20 @@ export function RiskLevels() {
           {risks.map((risk) => (
             <StaggerItem key={risk.level}>
               <article
-                className={`flex h-full flex-col rounded-2xl border bg-background p-7 ${risk.ring}`}
+                className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-background p-7 pl-8 shadow-[0_8px_30px_rgba(17,17,17,0.02)]"
               >
-                <div className="flex items-center gap-2.5">
-                  <span
-                    aria-hidden="true"
-                    className={`block h-2.5 w-2.5 rounded-full ${risk.dot}`}
-                  />
+                {/* 3px thick left gradient border */}
+                <div 
+                  aria-hidden="true"
+                  className={`absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b ${risk.colorClass}`} 
+                />
+                
+                <div className="flex items-center gap-2">
                   <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                     {risk.level}
                   </p>
                 </div>
-                <p className="mt-4 text-xl font-semibold tracking-tight">
+                <p className="mt-4 text-xl font-semibold tracking-tight text-foreground">
                   {risk.action}
                 </p>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
@@ -134,7 +133,7 @@ function TrustRow({
       {/* Sweeping wipe that passes across the row on entry */}
       <motion.span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-primary/8"
+        className="pointer-events-none absolute inset-0 bg-primary/4"
         variants={{
           hidden: { x: '-101%' },
           visible: {
@@ -143,10 +142,10 @@ function TrustRow({
           },
         }}
       />
-      {/* Hover fill */}
+      {/* Hover fill in subtle primary tint */}
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 origin-bottom scale-y-0 bg-card transition-transform duration-300 ease-out group-hover:scale-y-100"
+        className="pointer-events-none absolute inset-0 origin-bottom scale-y-0 bg-primary/3 transition-transform duration-300 ease-out group-hover:scale-y-100"
       />
 
       <motion.div
@@ -160,12 +159,12 @@ function TrustRow({
         }}
       >
         {/* Animated check that draws itself */}
-        <span className="hidden h-9 w-9 items-center justify-center rounded-full border border-primary/30 md:flex">
+        <span className="hidden h-9 w-9 items-center justify-center rounded-full border border-primary/30 bg-background md:flex">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <motion.path
               d="M3 8.5L6.5 12L13 4.5"
               stroke="var(--color-primary)"
-              strokeWidth={2}
+              strokeWidth={2.5}
               strokeLinecap="round"
               strokeLinejoin="round"
               variants={{
@@ -178,7 +177,7 @@ function TrustRow({
             />
           </svg>
         </span>
-        <p className="text-lg font-semibold tracking-tight">{item.title}</p>
+        <p className="text-lg font-semibold tracking-tight text-foreground">{item.title}</p>
         <p className="text-sm leading-relaxed text-muted-foreground md:text-base">
           {item.desc}
         </p>
@@ -189,7 +188,7 @@ function TrustRow({
 
 export function Trust() {
   return (
-    <section id="trust" className="py-24 md:py-32">
+    <section id="trust" className="py-24 md:py-32 bg-background">
       <div className="mx-auto max-w-5xl px-6">
         <div className="max-w-xl">
           <Reveal>

@@ -6,18 +6,18 @@ import Image from 'next/image'
 const screens = [
   {
     title: 'Home Dashboard',
-    desc: 'Your active conditions, current medications, and allergies in one clean, unified view.',
-    src: '/dashboard.png',
+    desc: 'Your active conditions, current medications, daily schedule, and quick actions in one clean, unified view.',
+    src: '/app-home.png',
   },
   {
-    title: 'AI Triage Assistant',
-    desc: 'Describe symptoms in natural language and receive an instant, personalized risk assessment.',
-    src: '/chat.png',
+    title: 'Health Timeline',
+    desc: 'All of your AI assessments, doctor consultations, and symptom history tracked in a clean, chronological diary.',
+    src: '/health-timeline.png',
   },
   {
-    title: 'Drug Safety Checker',
-    desc: 'Scan or search any medicine to verify there are no conflicts with your profile.',
-    src: '/safety.png',
+    title: 'Interaction Checker',
+    desc: 'Detailed clinical interaction alerts highlighting moderate-to-high risk drug conflicts and recommended precautions.',
+    src: '/interaction-detail.jpg',
   },
 ]
 

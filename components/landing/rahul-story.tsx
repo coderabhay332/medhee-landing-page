@@ -55,7 +55,7 @@ const frames: Frame[] = [
   {
     step: '02',
     title: 'Medhee already knows him.',
-    body: 'His conditions, medications, allergies and reports are already there. Nothing to repeat.',
+    body: 'His conditions, medications, allergies, and reports are already there. Nothing to repeat.',
     card: (
       <div className="grid grid-cols-2 gap-2.5">
         <MiniCard label="Condition">Type 2 Diabetes</MiniCard>
@@ -69,7 +69,7 @@ const frames: Frame[] = [
   },
   {
     step: '03',
-    title: '"I\u2019ve been vomiting."',
+    title: '"I’ve been vomiting."',
     body: 'One sentence is enough. The AI reads it with his full history behind it.',
     card: (
       <div className="space-y-2.5">
@@ -104,7 +104,7 @@ const frames: Frame[] = [
   {
     step: '05',
     title: 'A doctor joins. Fully briefed.',
-    body: 'Dr. Mehta receives Rahul\u2019s complete health profile before saying hello.',
+    body: 'Dr. Mehta receives Rahul’s complete health profile before saying hello.',
     card: (
       <div className="space-y-2.5">
         <MiniCard label="Consultation" tone="success">
@@ -141,11 +141,13 @@ export function RahulStory() {
     target: containerRef,
     offset: ['start start', 'end end'],
   })
+  
+  // Set end slide limit based on screen width/responsive design
   const x = useTransform(scrollYProgress, [0, 1], ['0%', '-68%'])
 
   return (
     <section id="story" ref={containerRef} className="relative h-[350vh]">
-      <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden">
+      <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden bg-background">
         <div className="mx-auto w-full max-w-6xl px-6">
           <Reveal>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
@@ -158,26 +160,70 @@ export function RahulStory() {
         </div>
 
         <motion.div style={{ x }} className="mt-14 flex gap-6 pl-6 md:pl-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))]">
-          {frames.map((frame) => (
-            <article
-              key={frame.step}
-              className="flex w-[320px] shrink-0 flex-col rounded-2xl border border-border bg-card p-6 shadow-[0_8px_30px_rgba(17,17,17,0.05)] md:w-[380px]"
-            >
-              <p className="font-mono text-xs text-muted-foreground">{frame.step}</p>
-              <h3 className="mt-3 text-xl font-semibold leading-snug tracking-tight">
-                {frame.title}
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                {frame.body}
-              </p>
-              <div className="mt-6">{frame.card}</div>
-            </article>
-          ))}
+          {frames.map((frame) => {
+            // Border accent color based on step phase
+            const borderCol =
+              frame.step === '04'
+                ? 'border-t-warning'
+                : frame.step === '05' || frame.step === '06'
+                  ? 'border-t-primary'
+                  : 'border-t-foreground/40'
+
+            return (
+              <article
+                key={frame.step}
+                className={`flex w-[320px] shrink-0 flex-col rounded-2xl border-t-2 border-x border-b border-border bg-card p-6 shadow-[0_8px_30px_rgba(17,17,17,0.03)] md:w-[380px] ${borderCol}`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs text-muted-foreground">{frame.step}</span>
+                  {frame.step === '04' && (
+                    <span className="rounded bg-warning/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-warning">
+                      Alert
+                    </span>
+                  )}
+                  {(frame.step === '05' || frame.step === '06') && (
+                    <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
+                      Resolved
+                    </span>
+                  )}
+                </div>
+                <h3 className="mt-4 text-xl font-semibold leading-snug tracking-tight text-foreground">
+                  {frame.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {frame.body}
+                </p>
+                <div className="mt-6">{frame.card}</div>
+              </article>
+            )
+          })}
         </motion.div>
 
-        <p className="mt-10 text-center text-xs uppercase tracking-[0.2em] text-muted-foreground">
-          Keep scrolling
-        </p>
+        {/* Progress tracker */}
+        <div className="mx-auto mt-12 flex w-full max-w-[280px] items-center justify-between gap-4 px-6">
+          <span className="text-[10px] font-mono text-muted-foreground/60">01</span>
+          <div className="relative h-1 w-full rounded-full bg-border/60">
+            <motion.div
+              className="absolute left-0 top-0 h-full rounded-full bg-primary"
+              style={{
+                width: useTransform(scrollYProgress, [0, 1], ['16.6%', '100%']),
+              }}
+            />
+          </div>
+          <span className="text-[10px] font-mono text-muted-foreground/60">06</span>
+        </div>
+
+        {/* Animated Mouse Scroll Hint */}
+        <div className="mt-8 flex flex-col items-center justify-center gap-1.5 text-center text-[10px] uppercase tracking-[0.25em] text-muted-foreground/60">
+          <span>Keep scrolling</span>
+          <motion.div
+            animate={{ y: [0, 5, 0] }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+            className="flex h-5 w-3.5 items-start justify-center rounded-full border border-muted-foreground/30 py-1"
+          >
+            <span className="h-1.5 w-0.5 rounded-full bg-primary animate-pulse" />
+          </motion.div>
+        </div>
       </div>
     </section>
   )
