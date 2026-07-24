@@ -1,0 +1,6 @@
+{
+  "name": "Medhee",
+  "description": "A Personal Health Operating System that continuously remembers your health history, reports, and context.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

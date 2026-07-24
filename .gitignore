@@ -1,34 +1,8 @@
-# Dependencies
 node_modules/
-
-# Next.js
-.next/
-out/
-
-# Production
 build/
-
-# Environment variables
-.env
-.env*.local
-
-# Debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-
-# IDE
-.vscode/
-.idea/
-
-# OS
+dist/
+coverage/
 .DS_Store
-Thumbs.db
-
-# Vercel
-.vercel/
-
-# TypeScript
-*.tsbuildinfo
-next-env.d.ts
+*.log
+.env*
+!.env.example
