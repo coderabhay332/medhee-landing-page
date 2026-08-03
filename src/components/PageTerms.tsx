@@ -3,9 +3,13 @@
  * Required by Google Play Store.
  */
 
+import { useEffect } from 'react';
 import { ArrowLeft, FileText, Mail } from 'lucide-react';
 
 export default function PageTerms() {
+  useEffect(() => {
+    document.title = 'Terms of Service — Medhee Personal Health OS';
+  }, []);
   return (
     <div className="min-h-screen bg-white font-sans">
       {/* Header */}

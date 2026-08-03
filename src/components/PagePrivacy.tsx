@@ -3,11 +3,15 @@
  * Required by Google Play Store and DPDP Act 2023.
  */
 
+import { useEffect } from 'react';
 import { ShieldCheck, ArrowLeft, Mail } from 'lucide-react';
 
 const PRIMARY = '#2260FF';
 
 export default function PagePrivacy() {
+  useEffect(() => {
+    document.title = 'Privacy Policy — Medhee Personal Health OS';
+  }, []);
   return (
     <div className="min-h-screen bg-white font-sans">
       {/* Header */}
