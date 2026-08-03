@@ -16,8 +16,16 @@ import SectionTrust from './components/SectionTrust';
 import SectionDashboard from './components/SectionDashboard';
 import SectionVision from './components/SectionVision';
 import SectionFooter from './components/SectionFooter';
+import PagePrivacy from './components/PagePrivacy';
+import PageTerms from './components/PageTerms';
+
+// ponytail: no router dep needed — single-level pathname routing is sufficient
+const path = window.location.pathname.replace(/\/$/, '');
 
 export default function App() {
+  if (path === '/privacy') return <PagePrivacy />;
+  if (path === '/terms')   return <PageTerms />;
+
   return (
     <div className="relative min-h-screen bg-bg-warm antialiased selection:bg-accent-soft selection:text-accent-emerald">
       {/* Navigation Header */}

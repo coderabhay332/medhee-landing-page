@@ -4,7 +4,7 @@
  */
 
 import { motion } from 'motion/react';
-import { Sparkles, ArrowUpRight, ShieldCheck, Heart } from 'lucide-react';
+import { ArrowUpRight, ShieldCheck } from 'lucide-react';
 
 export default function SectionFooter() {
   const handleScrollToTop = () => {
@@ -34,20 +34,22 @@ export default function SectionFooter() {
 
         {/* Crisp Call to Action Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
-          <button 
-            onClick={() => alert('Medhee OS v1.0 Client installation requested.')}
+          <a
+            href="https://play.google.com/store/apps/details?id=com.medhee.app"
+            target="_blank"
+            rel="noopener noreferrer"
             className="group px-8 py-4 rounded-full bg-primary-text hover:bg-accent-emerald text-white text-xs font-mono font-bold transition-all duration-300 shadow-md flex items-center gap-2"
           >
             DOWNLOAD MEDHEE
             <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-          </button>
+          </a>
           
-          <button 
-            onClick={() => alert('Doctor Network integration guidelines initiated.')}
+          <a
+            href="mailto:doctors@medhee.com"
             className="px-8 py-4 rounded-full bg-white hover:bg-bg-warm text-primary-text border border-border-light text-xs font-mono font-bold transition-all duration-300"
           >
             DOCTOR NETWORK PORTAL
-          </button>
+          </a>
         </div>
 
         {/* Beautiful iPhone Welcome Mockup */}
@@ -106,10 +108,10 @@ export default function SectionFooter() {
 
           {/* Clean list of compliance links */}
           <div className="flex flex-wrap items-center justify-center gap-6">
-            <button onClick={() => alert('End-to-End Privacy Charter')} className="hover:text-primary-text transition-colors">Privacy Charter</button>
-            <button onClick={() => alert('Clinical Safety Protocols')} className="hover:text-primary-text transition-colors">Clinical Safeguards</button>
-            <button onClick={() => alert('DPDP Compliance Ledger')} className="hover:text-primary-text transition-colors">DPDP</button>
-            <button onClick={() => alert('Developer & API Guidelines')} className="hover:text-primary-text transition-colors">Developer OS</button>
+            <a href="/privacy" className="font-medium text-primary-text hover:text-accent-emerald transition-colors underline underline-offset-4 decoration-accent-emerald/40">Privacy Policy</a>
+            <a href="/terms" className="font-medium text-primary-text hover:text-accent-emerald transition-colors underline underline-offset-4 decoration-accent-emerald/40">Terms of Service</a>
+            <a href="/privacy#security" className="hover:text-primary-text transition-colors">Clinical Safeguards</a>
+            <a href="mailto:legal@medhee.com" className="hover:text-primary-text transition-colors">Contact</a>
           </div>
         </div>
 
