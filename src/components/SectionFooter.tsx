@@ -5,6 +5,7 @@
 
 import { motion } from 'motion/react';
 import { ArrowUpRight, ShieldCheck } from 'lucide-react';
+import WaitlistForm from './WaitlistForm';
 
 export default function SectionFooter() {
   const handleScrollToTop = () => {
@@ -23,34 +24,26 @@ export default function SectionFooter() {
         
         {/* Core Narrative / Headline */}
         <div className="space-y-6 max-w-3xl">
-          <span className="text-xs font-mono uppercase tracking-[0.2em] text-accent-emerald font-bold">The Core Assurance</span>
+          <span className="text-xs font-mono uppercase tracking-[0.2em] text-accent-emerald font-bold">Early Access</span>
           <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-primary-text leading-[1.12]">
             Everyone deserves the confidence of having a doctor who already knows them.
           </h2>
           <p className="text-sm sm:text-base text-secondary-text font-light max-w-xl mx-auto leading-relaxed">
-            Download Medhee. Start your Personal Health Operating System on iOS or Android. Securely link your clinical record in 60 seconds.
+            Medhee is launching soon. Join the beta waitlist and be among the first to get access — we'll notify you the moment it's live.
           </p>
         </div>
 
-        {/* Crisp Call to Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
-          <a
-            href="https://play.google.com/store/apps/details?id=com.medhee.app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group px-8 py-4 rounded-full bg-primary-text hover:bg-accent-emerald text-white text-xs font-mono font-bold transition-all duration-300 shadow-md flex items-center gap-2"
-          >
-            DOWNLOAD MEDHEE
-            <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-          </a>
-          
-          <a
-            href="mailto:doctors@medhee.com"
-            className="px-8 py-4 rounded-full bg-white hover:bg-bg-warm text-primary-text border border-border-light text-xs font-mono font-bold transition-all duration-300"
-          >
-            DOCTOR NETWORK PORTAL
-          </a>
-        </div>
+        {/* Waitlist Form → Google Sheets */}
+        <WaitlistForm />
+
+        {/* Doctor portal secondary link */}
+        <a
+          href="mailto:doctors@medhee.com"
+          className="text-xs font-mono text-secondary-text hover:text-primary-text underline underline-offset-4 transition-colors"
+        >
+          Are you a doctor? Join the network →
+        </a>
+
 
         {/* Beautiful iPhone Welcome Mockup */}
         <div className="relative w-full max-w-[280px] h-[480px] bg-[#0c0c0d] rounded-[42px] p-[8px] shadow-[0_20px_45px_rgba(0,0,0,0.12)] border-4 border-[#2d2d30] overflow-hidden flex flex-col">
@@ -96,13 +89,25 @@ export default function SectionFooter() {
 
         {/* Minimalist Corporate Footer */}
         <div className="w-full pt-16 border-t border-border-light/60 flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-secondary-text font-light">
-          <div>
+          <div className="flex items-center gap-4">
             <button 
               onClick={handleScrollToTop}
-              className="font-display font-bold text-primary-text hover:opacity-80 transition-opacity mr-3"
+              className="font-display font-bold text-primary-text hover:opacity-80 transition-opacity"
             >
               Medhee
             </button>
+            <a
+              href="https://www.nvidia.com/en-us/startups/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="NVIDIA Inception Program Member"
+            >
+              <img
+                src="/nvidia-inception-badge.svg"
+                alt="NVIDIA Inception Program Member"
+                className="h-7 w-auto opacity-70 hover:opacity-100 transition-opacity"
+              />
+            </a>
             <span>© 2026 Medhee Inc. All rights reserved.</span>
           </div>
 

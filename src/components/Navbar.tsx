@@ -42,7 +42,7 @@ export default function Navbar() {
             className="group relative inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-surface-dark text-surface-pure text-xs font-semibold hover:bg-surface-raised transition-all duration-300 shadow-sm"
             id="btn-nav-cta"
           >
-            Download OS
+            Join Waitlist
             <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
           </button>
         </div>
