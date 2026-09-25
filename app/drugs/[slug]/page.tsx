@@ -4,13 +4,15 @@ import { notFound } from 'next/navigation';
 import {
   AlertTriangle,
   ArrowLeft,
+  ArrowRight,
   Check,
   ChevronDown,
+  ChevronRight,
   Pill,
   ShieldAlert,
   X,
 } from 'lucide-react';
-import { getAllDrugSlugs, getDrugBySlug, type DrugTable } from '@/lib/drugs';
+import { getAllDrugSlugs, getDrugBySlug, getRelatedDrugs, type DrugTable } from '@/lib/drugs';
 import { cleanText } from '@/lib/text';
 
 // Pre-render every drug page at build time (SSG); refresh daily (ISR).
@@ -96,36 +98,66 @@ export default async function DrugDetailPage({
   const article = await getDrugBySlug(slug);
   if (!article) notFound();
 
+  const related = await getRelatedDrugs(article.primaryCategory, article.slug, 6);
+
   const summary = cleanText(article.summary);
   const sections = (article.sections || [])
     .filter((s) => !EXCLUDED_SECTION_KEYS.has(s.key || ''))
     .filter((s) => s.paragraphs.length || s.lists.some((l) => l.items.length) || s.tables.length)
     .sort((a, b) => (a.order || 0) - (b.order || 0));
 
-  const articleSchema = {
+  const pageUrl = `https://medhee.com/drugs/${article.slug}`;
+  const description = cleanText(article.metaDescription || article.summary).slice(0, 160);
+
+  // Primary page schema describing the medication guide.
+  const medicalPageSchema = {
     '@context': 'https://schema.org',
     '@type': 'MedicalWebPage',
     name: article.title,
-    description: cleanText(article.metaDescription || article.summary).slice(0, 160),
-    url: `https://medhee.com/drugs/${article.slug}`,
+    description,
+    url: pageUrl,
     datePublished: article.datePublished || undefined,
     dateModified: article.dateModified || undefined,
     publisher: { '@type': 'Organization', name: 'Medhee', url: 'https://medhee.com' },
-    about: { '@type': 'Drug', name: article.drugName },
-    ...(article.faq?.length
-      ? {
-          mainEntity: article.faq.map((f) => ({
-            '@type': 'Question',
-            name: f.question,
-            acceptedAnswer: { '@type': 'Answer', text: cleanText(f.answer) },
-          })),
-        }
-      : {}),
+    about: {
+      '@type': 'Drug',
+      name: article.drugName,
+      ...(article.genericName ? { nonProprietaryName: article.genericName } : {}),
+      ...(article.brandName ? { alternateName: article.brandName } : {}),
+    },
   };
+
+  // Breadcrumbs help Google render a hierarchy in search results.
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://medhee.com/' },
+      { '@type': 'ListItem', position: 2, name: 'Drugs', item: 'https://medhee.com/drugs' },
+      { '@type': 'ListItem', position: 3, name: article.drugName, item: pageUrl },
+    ],
+  };
+
+  // A dedicated FAQPage is eligible for FAQ rich results.
+  const faqSchema = article.faq?.length
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: article.faq.map((f) => ({
+          '@type': 'Question',
+          name: f.question,
+          acceptedAnswer: { '@type': 'Answer', text: cleanText(f.answer) },
+        })),
+      }
+    : null;
 
   return (
     <div className="min-h-screen bg-bg-warm font-sans text-primary-text">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(medicalPageSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      {faqSchema && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      )}
 
       <header className="sticky top-0 z-20 border-b border-border-light bg-white/95 backdrop-blur-xl">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-4 md:px-8">
@@ -143,8 +175,22 @@ export default async function DrugDetailPage({
       <main>
         <section className="border-b border-border-light/70 bg-white">
           <div className="mx-auto max-w-5xl px-5 py-12 md:px-8 md:py-16">
+            {/* Visible breadcrumbs (mirrors the BreadcrumbList schema above) */}
+            <nav aria-label="Breadcrumb" className="mb-5">
+              <ol className="flex flex-wrap items-center gap-1.5 text-xs text-secondary-text">
+                <li>
+                  <Link href="/" className="transition-colors hover:text-primary-text">Home</Link>
+                </li>
+                <li aria-hidden="true"><ChevronRight className="h-3 w-3" /></li>
+                <li>
+                  <Link href="/drugs" className="transition-colors hover:text-primary-text">Drugs</Link>
+                </li>
+                <li aria-hidden="true"><ChevronRight className="h-3 w-3" /></li>
+                <li className="font-medium text-primary-text" aria-current="page">{article.drugName}</li>
+              </ol>
+            </nav>
             <div className="inline-flex items-center gap-2 rounded-full bg-accent-soft px-3 py-1.5 text-xs font-semibold text-accent-emerald">
-              <Pill className="h-4 w-4" /> Medication guide
+              <Pill className="h-4 w-4" /> {article.primaryCategory || 'Medication guide'}
             </div>
             <h1 className="mt-5 max-w-4xl font-display text-4xl font-bold tracking-tight sm:text-5xl">{article.drugName}</h1>
             {article.genericName && article.genericName.toLowerCase() !== article.drugName.toLowerCase() && (
@@ -252,6 +298,40 @@ export default async function DrugDetailPage({
                   </details>
                 ))}
               </div>
+            </section>
+          )}
+
+          {/* Internal links to sibling drugs — spreads crawl equity and keeps readers on-site. */}
+          {related.length > 0 && (
+            <section className="mt-12">
+              <p className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-accent-emerald">Keep reading</p>
+              <h2 className="mt-2 font-display text-3xl font-bold">
+                Related medicines{article.primaryCategory ? ` in ${article.primaryCategory}` : ''}
+              </h2>
+              <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {related.map((item) => (
+                  <Link
+                    key={item.slug}
+                    href={`/drugs/${item.slug}`}
+                    className="group flex flex-col rounded-2xl border border-border-light bg-white p-5 transition duration-300 hover:-translate-y-0.5 hover:border-accent-emerald/40 hover:shadow-lg"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className="font-display font-bold leading-tight">{item.drugName || item.title}</h3>
+                      <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-secondary-text transition-transform group-hover:translate-x-1 group-hover:text-accent-emerald" />
+                    </div>
+                    {item.genericName && item.genericName.toLowerCase() !== item.drugName.toLowerCase() && (
+                      <p className="mt-1 text-xs font-medium text-accent-emerald">{item.genericName}</p>
+                    )}
+                    <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-secondary-text">{cleanText(item.summary)}</p>
+                  </Link>
+                ))}
+              </div>
+              <Link
+                href="/drugs"
+                className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary-text transition-colors hover:text-accent-emerald"
+              >
+                Browse all medicines <ArrowRight className="h-4 w-4" />
+              </Link>
             </section>
           )}
 

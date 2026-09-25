@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, BookOpen } from 'lucide-react';
+import { ArrowLeft, BookOpen, ChevronRight } from 'lucide-react';
 import { getAllDrugs } from '@/lib/drugs';
 import DrugSearchGrid from './DrugSearchGrid';
 
@@ -33,11 +33,24 @@ export default async function DrugsPage() {
     isPartOf: { '@id': 'https://medhee.com/#website' },
   };
 
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://medhee.com/' },
+      { '@type': 'ListItem', position: 2, name: 'Drugs', item: 'https://medhee.com/drugs' },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-bg-warm font-sans text-primary-text">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       <header className="sticky top-0 z-20 border-b border-border-light bg-white/95 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 md:px-8">
@@ -55,6 +68,15 @@ export default async function DrugsPage() {
       <main>
         <section className="border-b border-border-light/70 bg-white">
           <div className="mx-auto max-w-6xl px-5 py-14 md:px-8 md:py-20">
+            <nav aria-label="Breadcrumb" className="mb-5">
+              <ol className="flex flex-wrap items-center gap-1.5 text-xs text-secondary-text">
+                <li>
+                  <Link href="/" className="transition-colors hover:text-primary-text">Home</Link>
+                </li>
+                <li aria-hidden="true"><ChevronRight className="h-3 w-3" /></li>
+                <li className="font-medium text-primary-text" aria-current="page">Drugs</li>
+              </ol>
+            </nav>
             <div className="max-w-3xl">
               <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-accent-soft px-3 py-1.5 text-xs font-semibold text-accent-emerald">
                 <BookOpen className="h-4 w-4" />
