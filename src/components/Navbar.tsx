@@ -29,6 +29,7 @@ export default function Navbar() {
             Medhee
           </a>
           <nav className="hidden md:flex items-center gap-5 text-xs font-medium text-secondary-text">
+            <a href="/drugs" className="hover:text-primary-text transition-colors">Drug Library</a>
             <a href="#app-showcase" className="hover:text-primary-text transition-colors">App Demo</a>
             <a href="#meet-rahul" className="hover:text-primary-text transition-colors">The Story</a>
             <a href="#doctor-dashboard" className="hover:text-primary-text transition-colors">Doctor Portal</a>

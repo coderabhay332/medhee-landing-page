@@ -18,13 +18,18 @@ import SectionVision from './components/SectionVision';
 import SectionFooter from './components/SectionFooter';
 import PagePrivacy from './components/PagePrivacy';
 import PageTerms from './components/PageTerms';
+import PageDrugs from './components/PageDrugs';
+import PageDrugDetail from './components/PageDrugDetail';
 
-// ponytail: no router dep needed — single-level pathname routing is sufficient
+// No router dependency is needed for these public, pathname-based pages.
 const path = window.location.pathname.replace(/\/$/, '');
+const drugDetailMatch = path.match(/^\/drugs\/([^/]+)$/);
 
 export default function App() {
   if (path === '/privacy') return <PagePrivacy />;
-  if (path === '/terms')   return <PageTerms />;
+  if (path === '/terms') return <PageTerms />;
+  if (path === '/drugs') return <PageDrugs />;
+  if (drugDetailMatch) return <PageDrugDetail slug={decodeURIComponent(drugDetailMatch[1])} />;
 
   return (
     <div className="relative min-h-screen bg-bg-warm antialiased selection:bg-accent-soft selection:text-accent-emerald">

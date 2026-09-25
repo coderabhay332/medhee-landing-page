@@ -113,6 +113,7 @@ export default function SectionFooter() {
 
           {/* Clean list of compliance links */}
           <div className="flex flex-wrap items-center justify-center gap-6">
+            <a href="/drugs" className="font-medium text-primary-text hover:text-accent-emerald transition-colors underline underline-offset-4 decoration-accent-emerald/40">Drug Library</a>
             <a href="/privacy" className="font-medium text-primary-text hover:text-accent-emerald transition-colors underline underline-offset-4 decoration-accent-emerald/40">Privacy Policy</a>
             <a href="/terms" className="font-medium text-primary-text hover:text-accent-emerald transition-colors underline underline-offset-4 decoration-accent-emerald/40">Terms of Service</a>
             <a href="/privacy#security" className="hover:text-primary-text transition-colors">Clinical Safeguards</a>
