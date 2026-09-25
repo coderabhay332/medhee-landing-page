@@ -243,3 +243,65 @@ export async function getCategoryBySlug(
   }
   return null;
 }
+
+// ─── A–Z index ───────────────────────────────────────────────────────────────
+
+/** First-letter bucket for a drug (A–Z, or "#" for non-alphabetic). */
+export function firstLetter(item: DrugListItem): string {
+  const name = (item.drugName || item.title || '').trim();
+  const ch = name.charAt(0).toUpperCase();
+  return ch >= 'A' && ch <= 'Z' ? ch : '#';
+}
+
+export const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+/**
+ * All drugs grouped by first letter, each group sorted alphabetically.
+ * Powers the A–Z browse index (no pagination needed — every drug is in the HTML).
+ */
+export async function getDrugsByLetter(): Promise<Record<string, DrugListItem[]>> {
+  const drugs = await getAllDrugs();
+  const groups: Record<string, DrugListItem[]> = {};
+  for (const drug of drugs) {
+    const letter = firstLetter(drug);
+    (groups[letter] ??= []).push(drug);
+  }
+  for (const list of Object.values(groups)) {
+    list.sort((a, b) => (a.drugName || a.title).localeCompare(b.drugName || b.title));
+  }
+  return groups;
+}
+
+/**
+ * A curated set of well-known drugs for a "Popular Drugs" highlight strip.
+ * Falls back gracefully to whatever slugs actually exist.
+ */
+const POPULAR_SLUGS = [
+  'ozempic-generic-semaglutide',
+  'lexapro-generic-escitalopram',
+  'lipitor-generic-atorvastatin',
+  'zoloft-generic-sertraline',
+  'prozac-generic-fluoxetine',
+  'tylenol-generic-acetaminophen',
+  'amoxil-generic-amoxicillin',
+  'motrin-pediatric-generic-ibuprofen-pediatric',
+];
+
+export async function getPopularDrugs(limit = 4): Promise<DrugListItem[]> {
+  const results: DrugListItem[] = [];
+  for (const slug of POPULAR_SLUGS) {
+    if (results.length >= limit) break;
+    const article = await getDrugBySlug(slug);
+    if (article) {
+      results.push({
+        slug: article.slug,
+        title: article.title,
+        drugName: article.drugName,
+        brandName: article.brandName,
+        genericName: article.genericName,
+        summary: article.summary,
+      });
+    }
+  }
+  return results;
+}

@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, BookOpen, ChevronRight } from 'lucide-react';
-import { getAllCategories, getAllDrugs } from '@/lib/drugs';
-import DrugSearchGrid from './DrugSearchGrid';
+import { ArrowLeft, ArrowUpRight, BookOpen, ChevronRight, Sparkles } from 'lucide-react';
+import { getAllCategories, getAllDrugs, getPopularDrugs } from '@/lib/drugs';
+import DrugBrowser from './DrugBrowser';
 
 // Rebuild this page at most once per day; content is otherwise static (SSG + ISR).
 export const revalidate = 86400;
@@ -10,7 +10,7 @@ export const revalidate = 86400;
 export const metadata: Metadata = {
   title: 'Drug Information Library — Uses, Dosage & Safety',
   description:
-    'Browse plain-language medication guides covering uses, dosage, side effects, precautions, and drug interactions for over 1,300 medicines.',
+    'Browse plain-language medication guides A–Z covering uses, dosage, side effects, precautions, and drug interactions for over 1,300 medicines.',
   alternates: { canonical: '/drugs' },
   openGraph: {
     title: 'Drug Information Library — Medhee',
@@ -22,8 +22,11 @@ export const metadata: Metadata = {
 };
 
 export default async function DrugsPage() {
-  const drugs = await getAllDrugs();
-  const categories = await getAllCategories();
+  const [drugs, categories, popular] = await Promise.all([
+    getAllDrugs(),
+    getAllCategories(),
+    getPopularDrugs(4),
+  ]);
 
   const collectionSchema = {
     '@context': 'https://schema.org',
@@ -44,15 +47,10 @@ export default async function DrugsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-bg-warm font-sans text-primary-text">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
+    <div id="top" className="min-h-screen bg-bg-warm font-sans text-primary-text">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+
       <header className="sticky top-0 z-20 border-b border-border-light bg-white/95 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 md:px-8">
           <Link href="/" className="flex items-center gap-2 text-sm text-secondary-text transition-colors hover:text-primary-text">
@@ -67,13 +65,11 @@ export default async function DrugsPage() {
       </header>
 
       <main>
-        <section className="border-b border-border-light/70 bg-white">
+        <section className="bg-white">
           <div className="mx-auto max-w-6xl px-5 py-14 md:px-8 md:py-20">
             <nav aria-label="Breadcrumb" className="mb-5">
               <ol className="flex flex-wrap items-center gap-1.5 text-xs text-secondary-text">
-                <li>
-                  <Link href="/" className="transition-colors hover:text-primary-text">Home</Link>
-                </li>
+                <li><Link href="/" className="transition-colors hover:text-primary-text">Home</Link></li>
                 <li aria-hidden="true"><ChevronRight className="h-3 w-3" /></li>
                 <li className="font-medium text-primary-text" aria-current="page">Drugs</li>
               </ol>
@@ -85,12 +81,43 @@ export default async function DrugsPage() {
               </div>
               <h1 className="font-display text-4xl font-bold tracking-tight sm:text-5xl">Understand your medicines.</h1>
               <p className="mt-4 max-w-2xl text-base leading-relaxed text-secondary-text md:text-lg">
-                Search clear, detailed information about medicine uses, dosage, side effects, precautions, and interactions.
+                Search or browse A–Z for clear information about medicine uses, dosage, side effects, precautions, and interactions.
               </p>
             </div>
 
-            {/* Browse by category — hub links that also strengthen internal linking. */}
-            <div className="mt-8">
+            {/* Popular Drugs */}
+            {popular.length > 0 && (
+              <div className="mt-12">
+                <h2 className="flex items-center gap-2 font-display text-2xl font-bold">
+                  <Sparkles className="h-5 w-5 text-accent-emerald" /> Popular drugs
+                </h2>
+                <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  {popular.map((d, i) => (
+                    <Link
+                      key={d.slug}
+                      href={`/drugs/${d.slug}`}
+                      className="group relative flex min-h-40 flex-col justify-between overflow-hidden rounded-3xl border border-border-light bg-white p-5 transition duration-300 hover:-translate-y-1 hover:border-accent-emerald/40 hover:shadow-xl hover:shadow-emerald-950/5"
+                    >
+                      <div className="flex items-start justify-between">
+                        <span className="font-mono text-xs text-secondary-text/60">
+                          {String(i + 1).padStart(2, '0')}
+                        </span>
+                        <ArrowUpRight className="h-4 w-4 text-secondary-text transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent-emerald" />
+                      </div>
+                      <div>
+                        <h3 className="font-display text-xl font-bold leading-tight">{d.drugName}</h3>
+                        {d.genericName && d.genericName.toLowerCase() !== d.drugName.toLowerCase() && (
+                          <p className="mt-1 text-sm text-secondary-text">{d.genericName}</p>
+                        )}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Browse by category */}
+            <div className="mt-12">
               <p className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-accent-emerald">Browse by category</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {categories.map((c) => (
@@ -104,8 +131,14 @@ export default async function DrugsPage() {
                 ))}
               </div>
             </div>
+          </div>
+        </section>
 
-            <DrugSearchGrid drugs={drugs} />
+        {/* Browse A–Z (search + letter index + grouped lists) */}
+        <section className="border-t border-border-light/70">
+          <div className="mx-auto max-w-6xl px-5 py-12 md:px-8 md:py-16">
+            <h2 className="font-display text-3xl font-bold">Browse drugs and medications</h2>
+            <DrugBrowser drugs={drugs} />
           </div>
         </section>
       </main>
