@@ -1,3 +1,4 @@
+'use client';
 /**
  * Privacy Policy page — medhee.com/privacy
  * Required by Google Play Store and DPDP Act 2023.

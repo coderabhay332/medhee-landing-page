@@ -1,3 +1,4 @@
+'use client';
 /**
  * Terms & Conditions page — medhee.com/terms
  * Required by Google Play Store.

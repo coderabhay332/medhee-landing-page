@@ -1,3 +1,4 @@
+'use client';
 /**
  * WaitlistForm — submits name + email to Google Sheets via Apps Script web app.
  * Set VITE_SHEETS_WEBHOOK in .env to your deployed Apps Script URL.
@@ -8,7 +9,7 @@ import { ArrowUpRight, CheckCircle2, Loader2 } from 'lucide-react';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
-const WEBHOOK_URL = import.meta.env.VITE_SHEETS_WEBHOOK as string | undefined;
+const WEBHOOK_URL = process.env.NEXT_PUBLIC_SHEETS_WEBHOOK as string | undefined;
 
 export default function WaitlistForm() {
   const [name, setName] = useState('');
