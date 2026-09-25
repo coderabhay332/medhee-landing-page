@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, BookOpen, ChevronRight } from 'lucide-react';
-import { getAllDrugs } from '@/lib/drugs';
+import { getAllCategories, getAllDrugs } from '@/lib/drugs';
 import DrugSearchGrid from './DrugSearchGrid';
 
 // Rebuild this page at most once per day; content is otherwise static (SSG + ISR).
@@ -23,6 +23,7 @@ export const metadata: Metadata = {
 
 export default async function DrugsPage() {
   const drugs = await getAllDrugs();
+  const categories = await getAllCategories();
 
   const collectionSchema = {
     '@context': 'https://schema.org',
@@ -87,6 +88,23 @@ export default async function DrugsPage() {
                 Search clear, detailed information about medicine uses, dosage, side effects, precautions, and interactions.
               </p>
             </div>
+
+            {/* Browse by category — hub links that also strengthen internal linking. */}
+            <div className="mt-8">
+              <p className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-accent-emerald">Browse by category</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {categories.map((c) => (
+                  <Link
+                    key={c.slug}
+                    href={`/drugs/category/${c.slug}`}
+                    className="rounded-full border border-border-light bg-white px-3 py-1.5 text-xs font-medium text-secondary-text transition-colors hover:border-accent-emerald/40 hover:text-primary-text"
+                  >
+                    {c.name} <span className="text-accent-emerald">({c.count})</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
             <DrugSearchGrid drugs={drugs} />
           </div>
         </section>

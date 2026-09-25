@@ -213,3 +213,33 @@ export async function getRelatedDrugs(
     return [];
   }
 }
+
+// ─── Category hub pages ──────────────────────────────────────────────────────
+
+/** URL-safe slug for a category name, e.g. "Heart Health" → "heart-health". */
+export function categoryToSlug(category: string): string {
+  return category
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+/** All categories with their drug counts, sorted by size (desc). */
+export async function getAllCategories(): Promise<Array<{ name: string; slug: string; count: number }>> {
+  const index = await loadCategoryIndex();
+  return [...index.entries()]
+    .map(([name, list]) => ({ name, slug: categoryToSlug(name), count: list.length }))
+    .sort((a, b) => b.count - a.count);
+}
+
+/** Resolve a category slug back to its display name + drugs. */
+export async function getCategoryBySlug(
+  slug: string,
+): Promise<{ name: string; drugs: DrugListItem[] } | null> {
+  const index = await loadCategoryIndex();
+  for (const [name, list] of index.entries()) {
+    if (categoryToSlug(name) === slug) return { name, drugs: list };
+  }
+  return null;
+}

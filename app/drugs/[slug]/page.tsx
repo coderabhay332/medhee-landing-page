@@ -12,7 +12,7 @@ import {
   ShieldAlert,
   X,
 } from 'lucide-react';
-import { getAllDrugSlugs, getDrugBySlug, getRelatedDrugs, type DrugTable } from '@/lib/drugs';
+import { getAllDrugSlugs, getDrugBySlug, getRelatedDrugs, categoryToSlug, type DrugTable } from '@/lib/drugs';
 import { cleanText } from '@/lib/text';
 
 // Pre-render every drug page at build time (SSG); refresh daily (ISR).
@@ -109,6 +109,22 @@ export default async function DrugDetailPage({
   const pageUrl = `https://medhee.com/drugs/${article.slug}`;
   const description = cleanText(article.metaDescription || article.summary).slice(0, 160);
 
+  // Build the on-page table of contents from the sections that actually render.
+  const toc: Array<{ id: string; label: string }> = [];
+  if (article.keyTakeaways?.length) toc.push({ id: 'key-takeaways', label: 'Key takeaways' });
+  if (article.pros?.length || article.cons?.length) toc.push({ id: 'benefits-risks', label: 'Benefits & risks' });
+  if (article.dosageNotes || article.dosageTables?.length) toc.push({ id: 'dosage', label: 'Dosage' });
+  if (article.interactions?.length) toc.push({ id: 'interactions', label: 'Interactions' });
+  for (const s of sections) {
+    if (s.anchor && s.heading) toc.push({ id: s.anchor, label: s.heading });
+  }
+  if (article.faq?.length) toc.push({ id: 'faq', label: 'FAQ' });
+
+  // Interaction agents feed schema.org drugInteraction / warning fields.
+  const interactionWarning = article.interactions?.length
+    ? `Interacts with: ${article.interactions.map((i) => i.agent).join(', ')}.`
+    : undefined;
+
   // Primary page schema describing the medication guide.
   const medicalPageSchema = {
     '@context': 'https://schema.org',
@@ -124,6 +140,13 @@ export default async function DrugDetailPage({
       name: article.drugName,
       ...(article.genericName ? { nonProprietaryName: article.genericName } : {}),
       ...(article.brandName ? { alternateName: article.brandName } : {}),
+      ...(article.primaryCategory ? { drugClass: article.primaryCategory } : {}),
+      ...(interactionWarning
+        ? {
+            warning: interactionWarning,
+            interactingDrug: article.interactions.map((i) => ({ '@type': 'Drug', name: i.agent })),
+          }
+        : {}),
     },
   };
 
@@ -198,12 +221,38 @@ export default async function DrugDetailPage({
             )}
             {summary && <p className="mt-6 max-w-4xl whitespace-pre-line text-base leading-8 text-secondary-text">{summary}</p>}
             {article.dateModified && <p className="mt-5 font-mono text-xs text-secondary-text">Last updated {article.dateModified}</p>}
+
+            {/* Convert readers into app users; also a useful internal link. */}
+            <a
+              href="https://medhee.com/#final-cta"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-surface-dark px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent-emerald"
+            >
+              <ShieldAlert className="h-4 w-4" />
+              Check {article.drugName} interactions with your medicines
+              <ArrowRight className="h-4 w-4" />
+            </a>
           </div>
         </section>
 
         <article className="mx-auto max-w-5xl px-5 py-10 md:px-8 md:py-14">
+          {/* On-page table of contents — improves UX and can earn sitelink anchors. */}
+          {toc.length > 2 && (
+            <nav aria-label="On this page" className="mb-10 rounded-2xl border border-border-light bg-white p-5">
+              <p className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-accent-emerald">On this page</p>
+              <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-2">
+                {toc.map((entry) => (
+                  <li key={entry.id}>
+                    <a href={`#${entry.id}`} className="text-sm text-secondary-text underline-offset-4 transition-colors hover:text-accent-emerald hover:underline">
+                      {entry.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )}
+
           {!!article.keyTakeaways?.length && (
-            <section className="rounded-3xl border border-emerald-200 bg-accent-soft/70 p-6 md:p-8">
+            <section id="key-takeaways" className="scroll-mt-24 rounded-3xl border border-emerald-200 bg-accent-soft/70 p-6 md:p-8">
               <p className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-accent-emerald">At a glance</p>
               <h2 className="mt-2 font-display text-2xl font-bold">Key takeaways</h2>
               <ul className="mt-5 grid gap-3 md:grid-cols-2">
@@ -218,7 +267,7 @@ export default async function DrugDetailPage({
           )}
 
           {(article.pros?.length > 0 || article.cons?.length > 0) && (
-            <section className="mt-8 grid gap-5 md:grid-cols-2">
+            <section id="benefits-risks" className="mt-8 grid scroll-mt-24 gap-5 md:grid-cols-2">
               {!!article.pros?.length && (
                 <div className="rounded-3xl border border-border-light bg-white p-6">
                   <h2 className="flex items-center gap-2 font-display text-xl font-bold"><Check className="h-5 w-5 text-accent-emerald" /> Benefits</h2>
@@ -239,7 +288,7 @@ export default async function DrugDetailPage({
           )}
 
           {(article.dosageNotes || article.dosageTables?.length > 0) && (
-            <section className="mt-12">
+            <section id="dosage" className="mt-12 scroll-mt-24">
               <p className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-accent-emerald">Taking this medicine</p>
               <h2 className="mt-2 font-display text-3xl font-bold">Dosage information</h2>
               {article.dosageNotes && <p className="mt-4 max-w-4xl text-base leading-8 text-secondary-text">{article.dosageNotes}</p>}
@@ -248,7 +297,7 @@ export default async function DrugDetailPage({
           )}
 
           {!!article.interactions?.length && (
-            <section className="mt-12">
+            <section id="interactions" className="mt-12 scroll-mt-24">
               <p className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-accent-emerald">Safety</p>
               <h2 className="mt-2 font-display text-3xl font-bold">Interactions</h2>
               <p className="mt-3 text-secondary-text">Tell your doctor or pharmacist about every medicine, supplement, and substance you use.</p>
@@ -284,7 +333,7 @@ export default async function DrugDetailPage({
           ))}
 
           {!!article.faq?.length && (
-            <section className="mt-12">
+            <section id="faq" className="mt-12 scroll-mt-24">
               <p className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-accent-emerald">Common questions</p>
               <h2 className="mt-2 font-display text-3xl font-bold">Frequently asked questions</h2>
               <div className="mt-5 divide-y divide-border-light rounded-3xl border border-border-light bg-white px-5 md:px-7">
@@ -326,12 +375,22 @@ export default async function DrugDetailPage({
                   </Link>
                 ))}
               </div>
-              <Link
-                href="/drugs"
-                className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary-text transition-colors hover:text-accent-emerald"
-              >
-                Browse all medicines <ArrowRight className="h-4 w-4" />
-              </Link>
+              <div className="mt-6 flex flex-wrap gap-4">
+                {article.primaryCategory && (
+                  <Link
+                    href={`/drugs/category/${categoryToSlug(article.primaryCategory)}`}
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-primary-text transition-colors hover:text-accent-emerald"
+                  >
+                    All {article.primaryCategory} medicines <ArrowRight className="h-4 w-4" />
+                  </Link>
+                )}
+                <Link
+                  href="/drugs"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-primary-text transition-colors hover:text-accent-emerald"
+                >
+                  Browse all medicines <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
             </section>
           )}
 

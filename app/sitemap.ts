@@ -1,12 +1,12 @@
 import type { MetadataRoute } from 'next';
-import { getAllDrugSlugs } from '@/lib/drugs';
+import { getAllCategories, getAllDrugSlugs } from '@/lib/drugs';
 
 const SITE = 'https://medhee.com';
 
 export const revalidate = 86400;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const slugs = await getAllDrugSlugs();
+  const [slugs, categories] = await Promise.all([getAllDrugSlugs(), getAllCategories()]);
   const now = new Date();
 
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -16,6 +16,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE}/terms`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
   ];
 
+  const categoryRoutes: MetadataRoute.Sitemap = categories.map((c) => ({
+    url: `${SITE}/drugs/category/${c.slug}`,
+    lastModified: now,
+    changeFrequency: 'weekly',
+    priority: 0.8,
+  }));
+
   const drugRoutes: MetadataRoute.Sitemap = slugs.map((slug) => ({
     url: `${SITE}/drugs/${slug}`,
     lastModified: now,
@@ -23,5 +30,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticRoutes, ...drugRoutes];
+  return [...staticRoutes, ...categoryRoutes, ...drugRoutes];
 }

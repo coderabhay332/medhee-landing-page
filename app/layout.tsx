@@ -57,14 +57,13 @@ export const metadata: Metadata = {
     title: 'Medhee | Official Website — Personal Health Operating System',
     description:
       'Medhee is healthcare that remembers you. Continuously link your medical history, drug safety alerts, and doctor network context in 60 seconds.',
-    images: [{ url: '/assets/og-preview.png', width: 1200, height: 630 }],
+    // OG image is generated dynamically by app/opengraph-image.tsx
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Medhee | Official Website — Personal Health Operating System',
     description:
       'Medhee is healthcare that remembers you. Continuously link your medical history, drug safety alerts, and doctor network context in 60 seconds.',
-    images: ['/assets/og-preview.png'],
   },
 };
 
@@ -77,7 +76,7 @@ const orgSchema = {
       name: 'Medhee',
       alternateName: ['Medhee Inc.', 'Medhee Health', 'medhee.com'],
       url: 'https://medhee.com/',
-      logo: 'https://medhee.com/assets/logo.png',
+      logo: 'https://medhee.com/opengraph-image',
       sameAs: ['https://twitter.com/medheehealth', 'https://linkedin.com/company/medhee'],
       contactPoint: {
         '@type': 'ContactPoint',
