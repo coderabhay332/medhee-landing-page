@@ -25,7 +25,7 @@ export default async function DrugsPage() {
   const [drugs, categories, popular] = await Promise.all([
     getAllDrugs(),
     getAllCategories(),
-    getPopularDrugs(4),
+    getPopularDrugs(8),
   ]);
 
   const collectionSchema = {

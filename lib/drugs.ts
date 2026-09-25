@@ -1,4 +1,7 @@
 import 'server-only';
+import { cache } from 'react';
+import { NodeHttpHandler } from '@smithy/node-http-handler';
+import { Agent } from 'node:https';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import {
   DynamoDBDocumentClient,
@@ -24,7 +27,17 @@ const TABLE = process.env.DYNAMO_TABLE_DRUG_ARTICLES || 'drug_articles';
 const STATUS_GSI = 'drugs-by-status';
 const PUB_STATUS = 'published';
 
-const client = new DynamoDBClient({ region: REGION });
+const client = new DynamoDBClient({
+  region: REGION,
+  // Large SSG builds fire thousands of reads; give the SDK more retries and a
+  // roomier keep-alive connection pool so transient blips don't fail the build.
+  maxAttempts: 5,
+  requestHandler: new NodeHttpHandler({
+    httpsAgent: new Agent({ keepAlive: true, maxSockets: 64 }),
+    connectionTimeout: 3000,
+    requestTimeout: 15000,
+  }),
+});
 const doc = DynamoDBDocumentClient.from(client, {
   marshallOptions: { removeUndefinedValues: true },
   unmarshallOptions: { wrapNumbers: false },
@@ -93,12 +106,24 @@ function toListItem(raw: Record<string, unknown>): DrugListItem {
   };
 }
 
-/** Fetch a single full article by slug (null if missing). */
-export async function getDrugBySlug(slug: string): Promise<DrugArticle | null> {
-  if (!slug) return null;
-  const res = await doc.send(new GetCommand({ TableName: TABLE, Key: { slug } }));
-  return (res.Item as DrugArticle) || null;
-}
+/** Fetch a single full article by slug (null if missing).
+ *  Wrapped in React `cache` so the page and its OG image share one read,
+ *  and retried once to absorb transient DynamoDB blips during large SSG builds. */
+export const getDrugBySlug = cache(
+  async (slug: string): Promise<DrugArticle | null> => {
+    if (!slug) return null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const res = await doc.send(new GetCommand({ TableName: TABLE, Key: { slug } }));
+        return (res.Item as DrugArticle) || null;
+      } catch (err) {
+        if (attempt === 2) throw err;
+        await new Promise((r) => setTimeout(r, 300 * (attempt + 1)));
+      }
+    }
+    return null;
+  },
+);
 
 /**
  * Every published drug slug — used for SSG (generateStaticParams) and the
@@ -274,17 +299,28 @@ export async function getDrugsByLetter(): Promise<Record<string, DrugListItem[]>
 
 /**
  * A curated set of well-known drugs for a "Popular Drugs" highlight strip.
- * Falls back gracefully to whatever slugs actually exist.
+ * Every slug below is verified to exist in the dataset; the fetch also falls
+ * back gracefully and simply skips any slug that is missing.
+ * Ordered by general recognizability across common therapeutic areas
+ * (weight-loss/diabetes, mental health, pain, cardiac, allergy).
  */
 const POPULAR_SLUGS = [
-  'ozempic-generic-semaglutide',
-  'lexapro-generic-escitalopram',
-  'lipitor-generic-atorvastatin',
-  'zoloft-generic-sertraline',
+  'ozempic-generic-semaglutide',        // diabetes / weight loss
+  'mounjaro-generic-tirzepatide-10mg',  // diabetes / weight loss
+  'lexapro-generic-escitalopram',       // mental health
+  'zoloft-generic-sertraline',          // mental health
+  'lipitor-generic-atorvastatin',       // cholesterol
+  'tylenol-generic-acetaminophen',      // pain / fever
+  'advil-generic-ibuprofen',            // pain
+  'amoxil-generic-amoxicillin',         // antibiotic
+  'synthroid-generic-levothyroxine',    // thyroid
+  'eliquis-generic-apixaban',           // blood thinner
+  'zyrtec-generic-cetirizine',          // allergy
+  'viagra-generic-sildenafil',          // men's health
   'prozac-generic-fluoxetine',
-  'tylenol-generic-acetaminophen',
-  'amoxil-generic-amoxicillin',
-  'motrin-pediatric-generic-ibuprofen-pediatric',
+  'adderall-generic-amphetamine-dextroamphetamine',
+  'jardiance-generic-empagliflozin',
+  'nexium-generic-esomeprazole',
 ];
 
 export async function getPopularDrugs(limit = 4): Promise<DrugListItem[]> {
