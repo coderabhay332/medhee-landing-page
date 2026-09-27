@@ -1,7 +1,7 @@
 'use client';
 /**
  * WaitlistForm — submits name + email to Google Sheets via Apps Script web app.
- * Set VITE_SHEETS_WEBHOOK in .env to your deployed Apps Script URL.
+ * Set NEXT_PUBLIC_SHEETS_WEBHOOK to your deployed Apps Script URL.
  */
 
 import { useState } from 'react';
@@ -19,7 +19,7 @@ export default function WaitlistForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!WEBHOOK_URL) {
-      console.warn('VITE_SHEETS_WEBHOOK not set');
+      console.warn('NEXT_PUBLIC_SHEETS_WEBHOOK is not set');
       setStatus('error');
       return;
     }
@@ -32,8 +32,8 @@ export default function WaitlistForm() {
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: name.trim(),
-          email: email.trim(),
+          name: name.trim().slice(0, 100),
+          email: email.trim().slice(0, 254),
           timestamp: new Date().toISOString(),
           source: 'landing-page',
         }),
@@ -49,10 +49,10 @@ export default function WaitlistForm() {
 
   if (status === 'success') {
     return (
-      <div className="flex flex-col items-center gap-3 py-4">
-        <CheckCircle2 className="w-10 h-10 text-accent-emerald" />
-        <p className="text-sm font-mono font-bold text-primary-text">YOU'RE ON THE LIST</p>
-        <p className="text-xs text-secondary-text font-light">We'll email you the moment Medhee goes live.</p>
+      <div className="flex flex-col items-center gap-2 py-4" role="status">
+        <CheckCircle2 className="w-10 h-10 text-accent-emerald" aria-hidden="true" />
+        <p className="text-base font-bold text-primary-text">You're on the list.</p>
+        <p className="text-sm text-secondary-text">We'll email you when Medhee is ready for you.</p>
       </div>
     );
   }
@@ -60,38 +60,57 @@ export default function WaitlistForm() {
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-md flex flex-col gap-3">
       <div className="flex flex-col sm:flex-row gap-3">
+        <label htmlFor="waitlist-name" className="sr-only">
+          Your name
+        </label>
         <input
+          id="waitlist-name"
           type="text"
           placeholder="Your name"
+          autoComplete="name"
+          maxLength={100}
           value={name}
-          onChange={e => setName(e.target.value)}
+          onChange={(e) => setName(e.target.value)}
           required
-          className="flex-1 px-4 py-3 rounded-full border border-border-light bg-white text-sm text-primary-text placeholder:text-secondary-text/60 outline-none focus:border-accent-emerald transition-colors"
+          className="flex-1 px-4 py-3 rounded-full border border-border-light bg-white text-sm text-primary-text placeholder:text-secondary-text/70 outline-none focus:border-accent-emerald transition-colors"
         />
+        <label htmlFor="waitlist-email" className="sr-only">
+          Email address
+        </label>
         <input
+          id="waitlist-email"
           type="email"
           placeholder="you@example.com"
+          autoComplete="email"
+          maxLength={254}
           value={email}
-          onChange={e => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
           required
-          className="flex-1 px-4 py-3 rounded-full border border-border-light bg-white text-sm text-primary-text placeholder:text-secondary-text/60 outline-none focus:border-accent-emerald transition-colors"
+          className="flex-1 px-4 py-3 rounded-full border border-border-light bg-white text-sm text-primary-text placeholder:text-secondary-text/70 outline-none focus:border-accent-emerald transition-colors"
         />
       </div>
       <button
         type="submit"
         disabled={status === 'loading'}
-        className="group px-8 py-3.5 rounded-full bg-primary-text hover:bg-accent-emerald disabled:opacity-60 text-white text-xs font-mono font-bold transition-all duration-300 shadow-md flex items-center justify-center gap-2"
+        className="group px-8 py-3.5 rounded-full bg-primary-text hover:bg-accent-emerald disabled:opacity-60 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2"
       >
         {status === 'loading' ? (
-          <><Loader2 className="w-4 h-4 animate-spin" /> JOINING...</>
+          <>
+            <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> Joining…
+          </>
         ) : (
-          <>JOIN BETA WAITLIST <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" /></>
+          <>
+            Join the waitlist <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" aria-hidden="true" />
+          </>
         )}
       </button>
       {status === 'error' && (
-        <p className="text-xs text-center text-red-500">
+        <p className="text-sm text-center text-accent-red" role="alert">
           Something went wrong. Email us at{' '}
-          <a href="mailto:beta@medhee.com" className="underline">beta@medhee.com</a>
+          <a href="mailto:beta@medhee.com" className="underline">
+            beta@medhee.com
+          </a>
+          .
         </p>
       )}
     </form>

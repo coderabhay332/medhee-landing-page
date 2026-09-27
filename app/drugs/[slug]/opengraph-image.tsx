@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og';
 import { getDrugBySlug } from '@/lib/drugs';
+import { MEDHEE_LOGO_PNG_DATA_URI } from '@/lib/brand-image';
 
 export const runtime = 'nodejs';
 export const alt = 'Medhee drug information guide';
@@ -32,7 +33,7 @@ export default async function DrugOgImage({ params }: { params: Promise<{ slug: 
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-            <div style={{ width: 26, height: 26, borderRadius: 999, background: '#0D9488' }} />
+            <img src={MEDHEE_LOGO_PNG_DATA_URI} width="52" height="52" alt="" />
             <div style={{ display: 'flex', fontSize: 30, fontWeight: 700, color: '#0F172A' }}>Medhee</div>
           </div>
           {category && (

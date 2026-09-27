@@ -30,15 +30,14 @@ const SITE_URL = 'https://medhee.com';
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Medhee | Official Website — Personal Health Operating System & Drug Safety',
+    default: 'Medhee — Your medicines, reports and doctor in one app',
     template: '%s | Medhee',
   },
   description:
-    'Medhee (medhee.com) is the official Personal Health Operating System. Continuously link medical records, active medications, allergies, and lab reports for instant clinical context and drug safety checking.',
+    'Medhee keeps your medicines, allergies and lab reports in one place, warns you about risky medicine combinations, and lets you consult a doctor who already knows your history. In English and Hindi.',
   keywords: [
-    'Medhee', 'medhee', 'medhee.com', 'Medhee Official Website', 'Medhee Health',
-    'Medhee OS', 'Drug Safety Checker', 'Medical Memory', 'Health Records App',
-    'AI Doctor Context', 'Clinical History App',
+    'Medhee', 'medhee.com', 'drug interaction checker', 'medicine reminder app', 'lab report explained',
+    'online doctor consultation', 'AI nurse', 'family health app', 'health records app India', 'Hindi health app',
   ],
   authors: [{ name: 'Medhee Inc.' }],
   robots: {
@@ -49,21 +48,25 @@ export const metadata: Metadata = {
     'max-video-preview': -1,
   },
   alternates: { canonical: '/' },
+  icons: {
+    icon: [{ url: '/favicon.ico', sizes: 'any' }, { url: '/icon.png', type: 'image/png', sizes: '512x512' }],
+    apple: [{ url: '/apple-icon.png', type: 'image/png', sizes: '180x180' }],
+  },
   openGraph: {
     type: 'website',
     url: SITE_URL,
     siteName: 'Medhee',
-    locale: 'en_US',
-    title: 'Medhee | Official Website — Personal Health Operating System',
+    locale: 'en_IN',
+    title: 'Medhee — Healthcare that remembers you',
     description:
-      'Medhee is healthcare that remembers you. Continuously link your medical history, drug safety alerts, and doctor network context in 60 seconds.',
+      'Your medicines, allergies and reports in one place. Medicine safety checks, an AI nurse, and doctor consults that start with your full history.',
     // OG image is generated dynamically by app/opengraph-image.tsx
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Medhee | Official Website — Personal Health Operating System',
+    title: 'Medhee — Healthcare that remembers you',
     description:
-      'Medhee is healthcare that remembers you. Continuously link your medical history, drug safety alerts, and doctor network context in 60 seconds.',
+      'Your medicines, allergies and reports in one place. Medicine safety checks, an AI nurse, and doctor consults that start with your full history.',
   },
 };
 
@@ -76,7 +79,7 @@ const orgSchema = {
       name: 'Medhee',
       alternateName: ['Medhee Inc.', 'Medhee Health', 'medhee.com'],
       url: 'https://medhee.com/',
-      logo: 'https://medhee.com/opengraph-image',
+      logo: 'https://medhee.com/medhee-logo.svg',
       sameAs: ['https://twitter.com/medheehealth', 'https://linkedin.com/company/medhee'],
       contactPoint: {
         '@type': 'ContactPoint',
@@ -96,12 +99,11 @@ const orgSchema = {
       '@type': 'SoftwareApplication',
       '@id': 'https://medhee.com/#software',
       name: 'Medhee',
-      alternateName: 'Medhee OS',
       applicationCategory: 'HealthApplication',
-      operatingSystem: 'iOS, Android, Web',
-      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      operatingSystem: 'Android, iOS, Web',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
       description:
-        'Medhee is a Personal Health Operating System that securely links medical records, drug safety checking, and instant clinical history synthesis.',
+        'Medhee keeps your medicines, allergies and lab reports in one place, checks medicine combinations for safety, and connects you with doctors who can see your history.',
     },
   ],
 };

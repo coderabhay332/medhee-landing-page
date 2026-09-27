@@ -1,161 +1,103 @@
 'use client';
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
 
 import { useState, useEffect, useRef } from 'react';
-import { motion, useAnimation } from 'motion/react';
-import { HelpCircle, RefreshCcw, ShieldAlert } from 'lucide-react';
+import { motion } from 'motion/react';
+import { HelpCircle, RotateCcw } from 'lucide-react';
+
+const QUESTIONS = [
+  'What medicines are you taking right now?',
+  'Are you allergic to any medicine?',
+  'When did this start?',
+  'Do you have your old reports with you?',
+  'Any long-term conditions — diabetes, BP, thyroid?',
+];
 
 export default function SectionZero() {
-  const [collapsed, setCollapsed] = useState(false);
-  const [inView, setInView] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+  const [answered, setAnswered] = useState(false);
+  const autoPlayed = useRef(false);
+  const ref = useRef<HTMLElement>(null);
 
+  // Play the transition once, the first time the section scrolls into view
   useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setInView(entry.isIntersecting);
+        if (entry.isIntersecting && !autoPlayed.current) {
+          autoPlayed.current = true;
+          timer = setTimeout(() => setAnswered(true), 3000);
+        }
       },
-      { threshold: 0.2 }
+      { threshold: 0.4 },
     );
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
+    observer.observe(el);
     return () => {
-      if (ref.current) {
-        observer.unobserve(ref.current);
-      }
+      observer.disconnect();
+      if (timer) clearTimeout(timer);
     };
   }, []);
 
-  useEffect(() => {
-    if (inView) {
-      // Auto trigger collapse sequence after 3 seconds for great visual storytelling
-      const timer = setTimeout(() => {
-        setCollapsed(true);
-      }, 3500);
-      return () => clearTimeout(timer);
-    } else {
-      // Reset when scrolling away to keep it interactive
-      setCollapsed(false);
-    }
-  }, [inView]);
-
-  const questions = [
-    { text: "What medications are you currently taking?", id: "q1" },
-    { text: "Are you allergic to any drugs or penicillin?", id: "q2" },
-    { text: "When did your current symptoms first start?", id: "q3" },
-    { text: "Can you upload your previous laboratory reports?", id: "q4" },
-    { text: "What chronic conditions do you have?", id: "q5" }
-  ];
-
   return (
-    <section 
-      ref={ref}
-      id="healthcare-starts-zero" 
-      className="relative py-12 md:py-16 bg-bg-warm text-primary-text overflow-hidden flex items-center justify-center border-y border-border-light/60"
-    >
-      {/* Subtle warm emerald glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full bg-radial from-accent-soft via-transparent to-transparent blur-3xl pointer-events-none" />
-
-      <div className="w-full max-w-5xl mx-auto px-6 md:px-12 flex flex-col items-center relative z-10">
-        
-        {/* Dynamic Canvas Container */}
-        <div className="w-full min-h-[360px] flex flex-col justify-between items-center relative">
-          
-          {/* Top Label */}
-          <div className="text-center space-y-1.5 mb-6">
-            <span className="text-xs font-mono tracking-[0.2em] text-accent-red uppercase">The Current Reality</span>
-            <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-primary-text">Starting From Zero</h2>
-          </div>
-
-          {/* Interactive Stack of repetitive Questions */}
-          <div className="flex-1 w-full max-w-2xl flex flex-col justify-center items-center relative">
-            
-            {/* The collapsible stack */}
-            <motion.div 
-              animate={collapsed ? { 
-                scale: 0.3, 
-                opacity: 0, 
-                y: -40,
-                filter: "blur(12px)"
-              } : { 
-                scale: 1, 
-                opacity: 1, 
-                y: 0,
-                filter: "blur(0px)"
-              }}
-              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full space-y-3.5"
-            >
-              {questions.map((q, index) => (
-                <motion.div
-                  key={q.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={inView ? { opacity: 1 - (index * 0.12), x: 0 } : { opacity: 0, x: -20 }}
-                  transition={{ delay: index * 0.15, duration: 0.6 }}
-                  className="bg-white border border-border-light rounded-2xl p-4 md:p-5 flex items-center gap-4 text-left shadow-sm hover:border-accent-emerald/40 transition-colors"
-                >
-                  <div className="w-8 h-8 rounded-full bg-accent-soft border border-accent-emerald/20 flex items-center justify-center flex-shrink-0 text-accent-emerald">
-                    <HelpCircle className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-secondary-text">Standard Medical Intake</span>
-                    <p className="text-sm md:text-base font-medium text-primary-text mt-0.5">{q.text}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-
-            {/* Overlap Resulting State - Healthcare shouldn't work like that */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9, filter: "blur(10px)" }}
-                animate={collapsed ? { 
-                  opacity: 1, 
-                  scale: 1, 
-                  filter: "blur(0px)" 
-                } : { 
-                  opacity: 0, 
-                  scale: 0.9, 
-                  filter: "blur(10px)" 
-                }}
-                transition={{ delay: 0.5, duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                className="text-center max-w-xl space-y-5 px-4"
-              >
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent-soft border border-accent-emerald/20 text-accent-emerald text-xs font-medium">
-                  <ShieldAlert className="w-3.5 h-3.5" />
-                  The Friction of Blank Diagnostics
-                </div>
-                
-                <h3 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-primary-text leading-tight">
-                  Healthcare shouldn’t <br />
-                  <span className="text-accent-red font-semibold">start from zero.</span>
-                </h3>
-                
-                <p className="text-xs sm:text-sm text-secondary-text leading-relaxed font-normal">
-                  Every doctor’s appointment, urgent care visit, or remote consultation spends 15 vital minutes recreating your medical context. We believe a person's life history is too important to be forgotten after every visit.
-                </p>
-              </motion.div>
-            </div>
-
-          </div>
-
-          {/* User Control Interface */}
-          <div className="mt-8 z-20">
-            <button
-              onClick={() => setCollapsed(!collapsed)}
-              className="px-4 py-2 rounded-full border border-border-light bg-white hover:bg-bg-warm text-xs font-mono text-primary-text shadow-xs transition-all duration-200 flex items-center gap-2"
-            >
-              <RefreshCcw className="w-3.5 h-3.5 text-accent-emerald" />
-              {collapsed ? "Replay intake cycle" : "Simulate Medhee Memory Integration"}
-            </button>
-          </div>
-
+    <section ref={ref} id="why-medhee" className="relative py-16 md:py-20 bg-white border-y border-border-light">
+      <div className="w-full max-w-5xl mx-auto px-6 md:px-12 space-y-12">
+        <div className="text-center space-y-2">
+          <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight text-primary-text">
+            Every visit starts with the same questions.
+          </h2>
+          <p className="text-base text-secondary-text">New clinic, new doctor, new app — you answer them all over again.</p>
         </div>
 
+        <div className="relative w-full max-w-2xl mx-auto min-h-[380px] flex items-center">
+          <motion.ul
+            animate={answered ? { opacity: 0, scale: 0.9, y: -20 } : { opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full space-y-3"
+            aria-hidden={answered}
+          >
+            {QUESTIONS.map((q) => (
+              <li key={q} className="bg-bg-warm border border-border-light rounded-2xl p-4 flex items-center gap-4 text-left">
+                <HelpCircle className="w-5 h-5 text-secondary-text flex-shrink-0" aria-hidden="true" />
+                <p className="text-sm md:text-base font-medium text-primary-text">{q}</p>
+              </li>
+            ))}
+          </motion.ul>
+
+          <motion.div
+            initial={false}
+            animate={answered ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+            transition={{ duration: 0.7, delay: answered ? 0.3 : 0 }}
+            className="absolute inset-0 flex flex-col items-center justify-center text-center gap-4 px-4 pointer-events-none"
+            aria-hidden={!answered}
+          >
+            <h3 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-primary-text leading-tight">
+              With Medhee, they're <span className="text-accent-emerald">already answered.</span>
+            </h3>
+            <p className="text-base text-secondary-text leading-relaxed max-w-xl">
+              Your medicines, allergies, conditions and reports stay in one place. When you consult a doctor in the app, they see it
+              before the call starts — and the AI nurse uses it to give advice that fits you.
+            </p>
+          </motion.div>
+        </div>
+
+        <div className="flex justify-center">
+          <button
+            onClick={() => setAnswered((v) => !v)}
+            className="px-5 py-2.5 rounded-full border border-border-light bg-white hover:bg-bg-warm text-sm font-medium text-primary-text transition-colors flex items-center gap-2"
+          >
+            <RotateCcw className="w-4 h-4 text-accent-emerald" aria-hidden="true" />
+            {answered ? 'Show the questions again' : 'Show the Medhee way'}
+          </button>
+        </div>
+
+        {/* Founder note */}
+        <figure className="max-w-2xl mx-auto pt-10 border-t border-border-light text-left space-y-3">
+          <figcaption className="text-sm font-semibold text-primary-text">Why we're building Medhee</figcaption>
+          <blockquote className="text-base md:text-lg text-secondary-text leading-relaxed">
+            Growing up with a doctor in the family, nobody at home guessed medicines or searched Google when they fell sick. The
+            doctor already knew everyone's allergies, reports and history. We want every family to have that.
+          </blockquote>
+        </figure>
       </div>
     </section>
   );

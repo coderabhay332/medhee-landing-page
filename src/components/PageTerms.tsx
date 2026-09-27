@@ -9,18 +9,22 @@ import { ArrowLeft, FileText, Mail } from 'lucide-react';
 
 export default function PageTerms() {
   useEffect(() => {
-    document.title = 'Terms of Service — Medhee Personal Health OS';
+    document.title = 'Terms of Service — Medhee';
   }, []);
   return (
     <div className="min-h-screen bg-white font-sans">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white border-b border-gray-100 px-6 py-4 flex items-center gap-4">
+      <div className="sticky top-0 z-10 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between gap-4">
         <a
           href="/"
           className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Medhee
+        </a>
+        <a href="/" className="flex items-center gap-2 font-bold text-gray-900" aria-label="Medhee home">
+          <img src="/medhee-logo.svg" alt="" width="30" height="30" className="h-[30px] w-[30px]" />
+          Medhee
         </a>
       </div>
 

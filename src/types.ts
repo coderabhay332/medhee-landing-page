@@ -1,8 +1,3 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 export interface HealthCard {
   id: string;
   type: 'medication' | 'allergy' | 'report' | 'chronic' | 'diet' | 'symptom';

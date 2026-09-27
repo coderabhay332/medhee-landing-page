@@ -1,127 +1,56 @@
 'use client';
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
 
-import { motion } from 'motion/react';
-import { ArrowUpRight, ShieldCheck } from 'lucide-react';
 import WaitlistForm from './WaitlistForm';
 
 export default function SectionFooter() {
-  const handleScrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   return (
-    <footer 
-      id="final-cta" 
-      className="relative py-16 md:py-20 bg-bg-warm overflow-hidden flex flex-col justify-center items-center border-t border-border-light/60"
-    >
-      {/* Background visual halo */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full bg-radial from-accent-soft/20 to-transparent blur-3xl pointer-events-none" />
-
-      <div className="w-full max-w-5xl mx-auto px-6 md:px-12 flex flex-col items-center text-center space-y-8 relative z-10">
-        
-        {/* Core Narrative / Headline */}
-        <div className="space-y-6 max-w-3xl">
-          <span className="text-xs font-mono uppercase tracking-[0.2em] text-accent-emerald font-bold">Early Access</span>
+    <footer id="final-cta" className="relative py-16 md:py-20 bg-white border-t border-border-light">
+      <div className="w-full max-w-5xl mx-auto px-6 md:px-12 flex flex-col items-center text-center space-y-8">
+        <div className="space-y-4 max-w-2xl">
           <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-primary-text leading-[1.12]">
-            Everyone deserves the confidence of having a doctor who already knows them.
+            Like having a doctor in the family.
           </h2>
-          <p className="text-sm sm:text-base text-secondary-text font-light max-w-xl mx-auto leading-relaxed">
-            Medhee is launching soon. Join the beta waitlist and be among the first to get access — we'll notify you the moment it's live.
+          <p className="text-base text-secondary-text max-w-xl mx-auto leading-relaxed">
+            Medhee is in beta. Join the waitlist and we'll email you when it's ready for you.
           </p>
         </div>
 
-        {/* Waitlist Form → Google Sheets */}
         <WaitlistForm />
 
-        {/* Doctor portal secondary link */}
-        <a
-          href="mailto:doctors@medhee.com"
-          className="text-xs font-mono text-secondary-text hover:text-primary-text underline underline-offset-4 transition-colors"
-        >
-          Are you a doctor? Join the network →
+        <a href="mailto:doctors@medhee.com" className="text-sm text-secondary-text hover:text-primary-text underline underline-offset-4 transition-colors">
+          Are you a doctor? Email us to join →
         </a>
 
-
-        {/* Beautiful iPhone Welcome Mockup */}
-        <div className="relative w-full max-w-[280px] h-[480px] bg-[#0c0c0d] rounded-[42px] p-[8px] shadow-[0_20px_45px_rgba(0,0,0,0.12)] border-4 border-[#2d2d30] overflow-hidden flex flex-col">
-          
-          {/* Dynamic Island */}
-          <div className="absolute top-2 left-1/2 -translate-x-1/2 w-20 h-5 bg-black rounded-full z-30" />
-
-          {/* iPhone screen content */}
-          <div className="flex-1 bg-white rounded-[34px] overflow-hidden p-5 pt-8 flex flex-col justify-between relative text-left">
-            
-            <div className="space-y-4">
-              <div className="flex justify-between items-center pb-2 border-b border-border-light/60">
-                <span className="text-[8px] font-mono font-bold text-accent-emerald">MEDHEE OS</span>
-                <span className="text-[7px] text-secondary-text">V1.0.4</span>
-              </div>
-
-              <div className="space-y-2">
-                <h4 className="text-xs font-bold text-primary-text">Welcome, Rahul</h4>
-                <p className="text-[10px] text-secondary-text leading-relaxed font-light">
-                  Your clinical memory blueprint is synced, encrypted, and continuous. You do not need to fill out any medical intake questionnaires.
-                </p>
-              </div>
-
-              {/* Status capsule */}
-              <div className="p-3 bg-accent-soft/40 border border-accent-soft rounded-xl space-y-1.5">
-                <p className="text-[10px] font-bold text-accent-emerald flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  Health context is active.
-                </p>
-                <p className="text-[8px] text-secondary-text font-light">
-                  Verified connections to 1,200 on-call clinical specialists are online.
-                </p>
-              </div>
-            </div>
-
-            <div className="text-center">
-              <span className="text-[8px] text-secondary-text font-mono">End-to-end local encryption</span>
-              <div className="w-12 h-0.5 bg-primary-text rounded-full mx-auto mt-2" />
-            </div>
-
-          </div>
-        </div>
-
-        {/* Minimalist Corporate Footer */}
-        <div className="w-full pt-16 border-t border-border-light/60 flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-secondary-text font-light">
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={handleScrollToTop}
-              className="font-display font-bold text-primary-text hover:opacity-80 transition-opacity"
+        <div className="w-full pt-12 border-t border-border-light flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-secondary-text">
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="font-display font-bold text-primary-text hover:opacity-80 transition-opacity flex items-center gap-2"
             >
+              <img src="/medhee-logo.svg" alt="" width="32" height="32" className="h-8 w-8" />
               Medhee
             </button>
-            <a
-              href="https://www.nvidia.com/en-us/startups/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="NVIDIA Inception Program Member"
-            >
-              <img
-                src="/nvidia-inception-badge.svg"
-                alt="NVIDIA Inception Program Member"
-                className="h-7 w-auto opacity-70 hover:opacity-100 transition-opacity"
-              />
+            <a href="https://www.nvidia.com/en-us/startups/" target="_blank" rel="noopener noreferrer" aria-label="NVIDIA Inception Program member">
+              <img src="/nvidia-inception-badge.svg" alt="NVIDIA Inception Program member" className="h-7 w-auto opacity-80 hover:opacity-100 transition-opacity" />
             </a>
-            <span>© 2026 Medhee Inc. All rights reserved.</span>
+            <span>© 2026 Medhee Inc.</span>
           </div>
 
-          {/* Clean list of compliance links */}
-          <div className="flex flex-wrap items-center justify-center gap-6">
-            <a href="/drugs" className="font-medium text-primary-text hover:text-accent-emerald transition-colors underline underline-offset-4 decoration-accent-emerald/40">Drug Library</a>
-            <a href="/privacy" className="font-medium text-primary-text hover:text-accent-emerald transition-colors underline underline-offset-4 decoration-accent-emerald/40">Privacy Policy</a>
-            <a href="/terms" className="font-medium text-primary-text hover:text-accent-emerald transition-colors underline underline-offset-4 decoration-accent-emerald/40">Terms of Service</a>
-            <a href="/privacy#security" className="hover:text-primary-text transition-colors">Clinical Safeguards</a>
-            <a href="mailto:legal@medhee.com" className="hover:text-primary-text transition-colors">Contact</a>
-          </div>
+          <nav aria-label="Footer" className="flex flex-wrap items-center justify-center gap-6">
+            <a href="/drugs" className="hover:text-primary-text transition-colors">
+              Drug library
+            </a>
+            <a href="/privacy" className="hover:text-primary-text transition-colors">
+              Privacy policy
+            </a>
+            <a href="/terms" className="hover:text-primary-text transition-colors">
+              Terms
+            </a>
+            <a href="mailto:legal@medhee.com" className="hover:text-primary-text transition-colors">
+              Contact
+            </a>
+          </nav>
         </div>
-
       </div>
     </footer>
   );

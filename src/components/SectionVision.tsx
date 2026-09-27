@@ -1,211 +1,86 @@
 'use client';
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'motion/react';
-import { 
-  ChevronRight, 
-  Layers, 
-  Cpu, 
-  Clock, 
-  Activity, 
-  Users, 
-  ShieldCheck, 
-  Sparkles, 
-  HeartHandshake 
-} from 'lucide-react';
+import { Pill, FileText, Mic, Video, Users, Languages, Watch, ShieldCheck, Siren, TrendingUp } from 'lucide-react';
 
-interface TimelineItem {
-  phase: 'today' | 'tomorrow';
-  label: string;
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-}
+type Phase = 'now' | 'next';
+
+const ITEMS: { phase: Phase; title: string; description: string; icon: typeof Pill }[] = [
+  { phase: 'now', title: 'Medicines and safety checks', description: 'Your schedule, dose reminders, and warnings for risky combinations or allergies.', icon: Pill },
+  { phase: 'now', title: 'Lab reports', description: 'Upload a report, see what is out of range, and ask questions about it.', icon: FileText },
+  { phase: 'now', title: 'AI nurse', description: 'Describe symptoms by voice or chat and get advice based on your history.', icon: Mic },
+  { phase: 'now', title: 'Doctor consults', description: 'Video, voice or chat with a doctor who can already see your profile.', icon: Video },
+  { phase: 'now', title: 'Family profiles', description: "Manage your parents' and children's medicines from one account.", icon: Users },
+  { phase: 'now', title: 'English and Hindi', description: 'Use the whole app in either language.', icon: Languages },
+  { phase: 'next', title: 'Wearables and home devices', description: 'Readings from glucose meters, BP monitors and watches added to your profile automatically.', icon: Watch },
+  { phase: 'next', title: 'Early warnings from your reports', description: 'Notice when a value is slowly getting worse across reports, before it becomes a problem.', icon: TrendingUp },
+  { phase: 'next', title: 'Emergency sharing', description: 'Share your key health details with family or an ambulance crew in one tap.', icon: Siren },
+  { phase: 'next', title: 'Insurance help', description: 'Keep bills and prescriptions ready for claims.', icon: ShieldCheck },
+];
+
+const FILTERS: { key: 'all' | Phase; label: string }[] = [
+  { key: 'all', label: 'All' },
+  { key: 'now', label: 'Available now' },
+  { key: 'next', label: 'Coming next' },
+];
 
 export default function SectionVision() {
-  const [activeTab, setActiveTab] = useState<'all' | 'today' | 'tomorrow'>('all');
-
-  const timeline: TimelineItem[] = [
-    // Today
-    {
-      phase: 'today',
-      label: "Today / Active core",
-      title: "Medication Memory",
-      description: "Continuous on-device ledger keeping strict, updated drug compatibility logs synchronized automatically.",
-      icon: <Layers className="w-4 h-4 text-accent-emerald" />
-    },
-    {
-      phase: 'today',
-      label: "Today / Active core",
-      title: "Reports Parsing",
-      description: "Structural medical data mined from Quest, Labcorp, and physician PDF files, compiled into structured trendlines.",
-      icon: <Cpu className="w-4 h-4 text-accent-emerald" />
-    },
-    {
-      phase: 'today',
-      label: "Today / Active core",
-      title: "Context-Aware AI",
-      description: "Triage chat restricted by your unique medical timeline to prevent standard chatbot hallucinations.",
-      icon: <Sparkles className="w-4 h-4 text-accent-emerald" />
-    },
-    {
-      phase: 'today',
-      label: "Today / Active core",
-      title: "Doctor Handoff Portal",
-      description: "Instant medical consultations with board-certified physicians, initialized with complete context transfers.",
-      icon: <HeartHandshake className="w-4 h-4 text-accent-emerald" />
-    },
-    // Tomorrow
-    {
-      phase: 'tomorrow',
-      label: "Tomorrow / Platform Expansion",
-      title: "Wearables & Telemetry Integration",
-      description: "Live, continuous biometric parsing (ECG, blood glucose, sleep metrics) streamed straight to your encrypted memory card.",
-      icon: <Activity className="w-4 h-4 text-accent-amber" />
-    },
-    {
-      phase: 'tomorrow',
-      label: "Tomorrow / Platform Expansion",
-      title: "Family Health Architectures",
-      description: "Coordinated records for dependents, infants, and elderly parents. Shared family contexts to simplify elder care.",
-      icon: <Users className="w-4 h-4 text-accent-amber" />
-    },
-    {
-      phase: 'tomorrow',
-      label: "Tomorrow / Platform Expansion",
-      title: "Insurance Layer Coordination",
-      description: "Automated co-pay validation and pre-authorization processing during active doctor consultation streams.",
-      icon: <ShieldCheck className="w-4 h-4 text-accent-amber" />
-    },
-    {
-      phase: 'tomorrow',
-      label: "Tomorrow / Platform Expansion",
-      title: "Emergency EMT Responder Routing",
-      description: "Instant physical routing and background medical profile transfers to dispatchers and critical care responders.",
-      icon: <Clock className="w-4 h-4 text-accent-amber" />
-    },
-    {
-      phase: 'tomorrow',
-      label: "Tomorrow / Platform Expansion",
-      title: "Continuous Preventive Intelligence",
-      description: "Algorithmic health tracking that notices subtle anomalies across reports, triggering proactive clinical interventions.",
-      icon: <Sparkles className="w-4 h-4 text-accent-amber" />
-    }
-  ];
-
-  const filteredTimeline = timeline.filter(item => {
-    if (activeTab === 'all') return true;
-    return item.phase === activeTab;
-  });
+  const [filter, setFilter] = useState<'all' | Phase>('all');
+  const visible = ITEMS.filter((i) => filter === 'all' || i.phase === filter);
 
   return (
-    <section 
-      id="vision" 
-      className="relative py-12 md:py-16 px-6 md:px-12 bg-white overflow-hidden flex flex-col justify-center items-center"
-    >
-      <div className="w-full max-w-6xl mx-auto space-y-8">
-        
-        {/* Section Header */}
+    <section id="vision" className="relative py-16 md:py-20 px-6 md:px-12 bg-bg-warm border-t border-border-light">
+      <div className="w-full max-w-6xl mx-auto space-y-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-border-light pb-8">
           <div className="space-y-3 text-left">
-            <span className="text-xs font-mono uppercase tracking-[0.2em] text-accent-emerald font-bold">The Strategic Roadmap</span>
-            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-primary-text">
-              The Health Operating System
-            </h2>
-            <p className="text-sm sm:text-base text-secondary-text font-light max-w-xl">
-              Medhee is more than an assistant. It is transitioning into the baseline layer for all personal clinical workflows.
-            </p>
+            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-primary-text">What's ready, and what's next.</h2>
+            <p className="text-base text-secondary-text max-w-xl">Everything under “Available now” is in the app today. The rest is what we're working on.</p>
           </div>
 
-          {/* Timeline filter controls */}
-          <div className="flex items-center gap-2 self-start md:self-auto bg-bg-warm p-1.5 rounded-full border border-border-light">
-            <button 
-              onClick={() => setActiveTab('all')}
-              className={`text-xs px-4 py-1.5 rounded-full font-medium transition-all ${activeTab === 'all' ? 'bg-primary-text text-white shadow-sm' : 'text-secondary-text hover:text-primary-text'}`}
-            >
-              Full Vision
-            </button>
-            <button 
-              onClick={() => setActiveTab('today')}
-              className={`text-xs px-4 py-1.5 rounded-full font-medium transition-all ${activeTab === 'today' ? 'bg-accent-emerald text-white shadow-sm' : 'text-secondary-text hover:text-primary-text'}`}
-            >
-              Today
-            </button>
-            <button 
-              onClick={() => setActiveTab('tomorrow')}
-              className={`text-xs px-4 py-1.5 rounded-full font-medium transition-all ${activeTab === 'tomorrow' ? 'bg-[#D97706] text-white shadow-sm' : 'text-secondary-text hover:text-primary-text'}`}
-            >
-              Tomorrow
-            </button>
-          </div>
-        </div>
-
-        {/* Timeline Layout */}
-        <div className="relative">
-          
-          {/* Vertical core trace line */}
-          <div className="absolute left-[20px] md:left-1/2 md:-translate-x-1/2 top-4 bottom-4 w-px bg-border-light/80" />
-
-          {/* Timeline nodes */}
-          <div className="space-y-12">
-            {filteredTimeline.map((item, idx) => (
-              <motion.div 
-                key={idx}
-                initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.5, delay: idx * 0.08 }}
-                className={`flex flex-col md:flex-row relative items-start ${idx % 2 === 0 ? 'md:flex-row-reverse' : ''}`}
+          <div className="flex items-center gap-1 self-start md:self-auto bg-white p-1 rounded-full border border-border-light" role="group" aria-label="Filter roadmap">
+            {FILTERS.map((f) => (
+              <button
+                key={f.key}
+                onClick={() => setFilter(f.key)}
+                aria-pressed={filter === f.key}
+                className={`text-sm px-4 py-1.5 rounded-full font-medium transition-colors ${
+                  filter === f.key ? 'bg-primary-text text-white' : 'text-secondary-text hover:text-primary-text'
+                }`}
               >
-                
-                {/* Timeline node icon */}
-                <div className="absolute left-0 md:left-1/2 md:-translate-x-1/2 top-1.5 w-10 h-10 rounded-full bg-white border border-border-light flex items-center justify-center z-10 shadow-sm">
-                  {item.icon}
-                </div>
-
-                {/* Content card */}
-                <div className={`w-full md:w-[calc(50%-32px)] pl-14 md:pl-0 ${idx % 2 === 0 ? 'md:text-left md:pr-8' : 'md:text-left md:pl-8'}`}>
-                  <div className="bg-bg-warm border border-border-light p-6 rounded-2xl hover:border-accent-emerald hover:shadow-sm transition-all duration-300">
-                    <span className={`text-[9px] font-mono uppercase tracking-wider font-bold ${item.phase === 'today' ? 'text-accent-emerald' : 'text-accent-amber'}`}>
-                      {item.label}
-                    </span>
-                    <h3 className="text-base font-bold text-primary-text mt-1">{item.title}</h3>
-                    <p className="text-xs sm:text-sm text-secondary-text font-light mt-2 leading-relaxed">
-                      {item.description}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Empty visual column to preserve grid geometry */}
-                <div className="hidden md:block w-[calc(50%-32px)]" />
-
-              </motion.div>
+                {f.label}
+              </button>
             ))}
           </div>
-
         </div>
 
-        {/* Large Strategic Concluding Quote */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="bg-bg-warm border border-border-light rounded-[32px] p-8 md:p-12 text-center max-w-4xl mx-auto space-y-4"
-        >
-          <span className="text-xs font-mono uppercase tracking-[0.2em] text-accent-emerald font-bold">The Continuous Care Horizon</span>
-          <h3 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-primary-text leading-snug">
-            Becoming the benchmark layer for personal healthcare.
-          </h3>
-          <p className="text-xs sm:text-sm text-secondary-text max-w-2xl mx-auto leading-relaxed font-light">
-            We are building a future where your healthcare decisions are never isolated. Through Wearables, Family Syncing, and Emergency response, Medhee turns clinical data into real-time health protection.
-          </p>
-        </motion.div>
-
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {visible.map((item, idx) => {
+            const Icon = item.icon;
+            const isNow = item.phase === 'now';
+            return (
+              <motion.li
+                key={item.title}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.35, delay: idx * 0.04 }}
+                className={`p-6 rounded-2xl border space-y-3 ${isNow ? 'bg-white border-border-light' : 'bg-transparent border-dashed border-slate-300'}`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className={`p-2 rounded-lg ${isNow ? 'bg-accent-soft text-accent-emerald' : 'bg-amber-50 text-accent-amber'}`}>
+                    <Icon className="w-5 h-5" aria-hidden="true" />
+                  </span>
+                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${isNow ? 'bg-accent-soft text-accent-emerald' : 'bg-amber-50 text-amber-800'}`}>
+                    {isNow ? 'Available now' : 'Coming next'}
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-primary-text">{item.title}</h3>
+                <p className="text-sm text-secondary-text leading-relaxed">{item.description}</p>
+              </motion.li>
+            );
+          })}
+        </ul>
       </div>
     </section>
   );

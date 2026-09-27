@@ -1,7 +1,8 @@
 import { ImageResponse } from 'next/og';
+import { MEDHEE_LOGO_PNG_DATA_URI } from '@/lib/brand-image';
 
 export const runtime = 'nodejs';
-export const alt = 'Medhee — Personal Health Operating System & Drug Safety';
+export const alt = 'Medhee — Healthcare that remembers you';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -21,7 +22,9 @@ export default function OgImage() {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-          <div style={{ width: 28, height: 28, borderRadius: 999, background: '#0D9488' }} />
+          <div style={{ width: 64, height: 64, borderRadius: 16, background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <img src={MEDHEE_LOGO_PNG_DATA_URI} width="56" height="56" alt="" />
+          </div>
           <div style={{ display: 'flex', fontSize: 34, fontWeight: 700, color: '#FFFFFF' }}>Medhee</div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -29,7 +32,7 @@ export default function OgImage() {
             Healthcare that remembers you.
           </div>
           <div style={{ display: 'flex', fontSize: 32, color: '#A7F3D0' }}>
-            Personal Health OS · Drug Safety · Medication Guides
+            Medicines · Lab reports · Doctor consults · English & Hindi
           </div>
         </div>
         <div style={{ display: 'flex', fontSize: 26, color: '#94A3B8' }}>medhee.com</div>

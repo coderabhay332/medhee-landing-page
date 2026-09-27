@@ -58,7 +58,7 @@ export default async function DrugsPage() {
             Back to Medhee
           </Link>
           <Link href="/" className="flex items-center gap-2 font-display font-bold tracking-tight text-primary-text">
-            <span className="h-2.5 w-2.5 rounded-full bg-accent-emerald" />
+            <img src="/medhee-logo.svg" alt="" width="30" height="30" className="h-[30px] w-[30px]" />
             Medhee
           </Link>
         </div>

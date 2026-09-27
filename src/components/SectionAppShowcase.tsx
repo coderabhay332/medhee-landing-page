@@ -1,958 +1,489 @@
 'use client';
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  Home, 
-  Pill, 
-  FileText, 
-  User, 
-  Clock, 
-  ShieldAlert, 
-  Sparkles, 
-  ChevronRight, 
-  CheckCircle2, 
-  AlertTriangle, 
-  Apple, 
-  Calendar, 
-  Activity, 
-  Camera, 
-  Upload, 
-  MessageSquare, 
-  Bell, 
-  Mic, 
-  Plus, 
-  Search, 
-  Filter, 
-  ArrowRight,
-  RotateCcw,
-  Info,
+import {
+  Home,
+  Pill,
+  ShieldCheck,
+  ShieldAlert,
+  ChevronRight,
+  Apple,
+  Activity,
+  Camera,
+  Upload,
+  MessageSquare,
+  Bell,
+  Mic,
+  Plus,
   Check,
   X,
-  Share2,
-  PhoneCall,
-  Heart
+  Info,
+  AlertTriangle,
 } from 'lucide-react';
 
-type ScreenKey = 'home' | 'timeline' | 'interaction' | 'diet';
+type ScreenKey = 'home' | 'history' | 'interaction' | 'diet';
+
+const SCREENS: { key: ScreenKey; label: string; desc: string; icon: typeof Home }[] = [
+  { key: 'home', label: 'Home', desc: "Today's medicines", icon: Home },
+  { key: 'history', label: 'Health history', desc: 'Past symptoms', icon: Activity },
+  { key: 'interaction', label: 'Interaction check', desc: 'Medicine combinations', icon: ShieldAlert },
+  { key: 'diet', label: 'Diet plan', desc: 'What to eat', icon: Apple },
+];
+
+const INFO: Record<ScreenKey, { title: string; body: string; try: string }> = {
+  home: {
+    title: 'Your day at a glance',
+    body: "See which medicines are due, mark doses as taken, and get reminders on your phone. If any of your medicines don't mix well, you'll see it here.",
+    try: 'Tap “Take” on a medicine.',
+  },
+  history: {
+    title: 'Every symptom check, saved',
+    body: 'Each time you check a symptom, Medhee saves what happened and the advice you got. Your doctor can see the same history.',
+    try: 'Tap “Details” on a past entry.',
+  },
+  interaction: {
+    title: 'Know when two medicines don’t mix',
+    body: 'When two of your medicines interact, Medhee explains why in plain words, when to be most careful during the day, and which symptoms mean you should get help.',
+    try: 'Tap the times to see when the effect is strongest.',
+  },
+  diet: {
+    title: 'Food that works with your medicines',
+    body: 'A diet plan built from your conditions and medicines, with everyday Indian food — what to eat more of and what to limit.',
+    try: 'Switch between “Eat” and “Limit”.',
+  },
+};
+
+const TIMES = [
+  { h: 8, label: '8 AM', note: 'Both taken' },
+  { h: 10, label: '10 AM', note: 'Effect starts' },
+  { h: 12, label: '12 PM', note: 'Strongest' },
+  { h: 18, label: '6 PM', note: 'Wearing off' },
+];
+
+const TIME_ADVICE: Record<number, string> = {
+  8: 'You took both medicines with breakfast.',
+  10: 'You may start to feel sleepy. Avoid driving if you do.',
+  12: 'Drowsiness is usually strongest now. Don’t drive or operate machinery.',
+  18: 'The effect is wearing off, but take it easy if you still feel drowsy.',
+};
+
+const EAT = [
+  { name: 'Khichdi with a little ghee', note: 'Easy to digest' },
+  { name: 'Dal, rice and sabzi', note: 'Balanced meal' },
+  { name: 'Idli with sambar', note: 'Steamed, low fat' },
+  { name: 'Poha with peanuts', note: 'Slow-release carbs' },
+  { name: 'Curd rice', note: 'Good for the gut' },
+];
+
+const LIMIT = [
+  { name: 'Pani puri and fried snacks', note: 'Can worsen acidity' },
+  { name: 'Sweets and sugary drinks', note: 'Raise blood sugar quickly' },
+];
 
 export default function SectionAppShowcase() {
-  const [activeScreen, setActiveScreen] = useState<ScreenKey>('home');
-  const [isAutoPlay, setIsAutoPlay] = useState<boolean>(true);
+  const [screen, setScreen] = useState<ScreenKey>('home');
+  const [taken, setTaken] = useState<Record<string, boolean>>({});
+  const [toast, setToast] = useState<string | null>(null);
+  const [openEntry, setOpenEntry] = useState<string | null>('1');
+  const [hour, setHour] = useState(12);
+  const [dietTab, setDietTab] = useState<'eat' | 'limit'>('eat');
 
-  // Screen 1: Home State
-  const [medsTaken, setMedsTaken] = useState<{ [key: string]: boolean }>({
-    med1: false,
-    med2: false
-  });
-  const [activeMember, setActiveMember] = useState<'Abhay' | 'Family'>('Abhay');
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  // Screen 2: Timeline State
-  const [timelineFilter, setTimelineFilter] = useState<'all' | 'active' | 'moderate'>('all');
-  const [expandedTimelineId, setExpandedTimelineId] = useState<string | null>('1');
-
-  // Screen 3: Interaction State
-  const [selectedTimelineHour, setSelectedTimelineHour] = useState<number>(12); // 8, 9, 12, 18
-  const [checkedActions, setCheckedActions] = useState<{ [key: string]: boolean }>({
-    act1: true,
-    act2: true
-  });
-
-  // Screen 4: Diet State
-  const [dietTab, setDietTab] = useState<'eat' | 'avoid' | 'summary'>('eat');
-
-  // Auto-play interval
   useEffect(() => {
-    if (!isAutoPlay) return;
-    const screens: ScreenKey[] = ['home', 'timeline', 'interaction', 'diet'];
-    const interval = setInterval(() => {
-      setActiveScreen(prev => {
-        const nextIdx = (screens.indexOf(prev) + 1) % screens.length;
-        return screens[nextIdx];
-      });
-    }, 8000);
-    return () => clearInterval(interval);
-  }, [isAutoPlay]);
+    if (!toast) return;
+    const id = setTimeout(() => setToast(null), 2500);
+    return () => clearTimeout(id);
+  }, [toast]);
 
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
+  const doses = [
+    { id: 'med1', name: 'Cetirizine 10mg', time: '9:30 AM · after food' },
+    { id: 'med2', name: 'Pantoprazole 40mg', time: '2:00 PM · 30 min before lunch' },
+  ];
+  const takenCount = doses.filter((d) => taken[d.id]).length;
+  const pct = Math.round((takenCount / doses.length) * 100);
 
-  const toggleMed = (id: string) => {
-    setMedsTaken(prev => {
-      const updated = { ...prev, [id]: !prev[id] };
-      const takenCount = Object.values(updated).filter(Boolean).length;
-      if (updated[id]) {
-        showToast(`Dose marked as taken! (${takenCount}/2 completed)`);
-      }
-      return updated;
+  const toggleDose = (id: string) => {
+    setTaken((prev) => {
+      const next = { ...prev, [id]: !prev[id] };
+      if (next[id]) setToast(`Dose marked as taken (${doses.filter((d) => next[d.id]).length}/${doses.length})`);
+      return next;
     });
   };
 
-  const takenCount = Object.values(medsTaken).filter(Boolean).length;
-  const progressPercent = Math.round((takenCount / 2) * 100);
+  const info = INFO[screen];
 
   return (
-    <section id="app-showcase" className="relative py-12 md:py-16 px-6 md:px-12 bg-bg-warm border-t border-border-light overflow-hidden">
-      
-      {/* Background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-radial from-accent-soft/20 to-transparent blur-3xl pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto space-y-8 relative z-10">
-        
-        {/* Header */}
-        <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-border-light text-xs font-semibold uppercase tracking-widest text-accent-emerald">
-            <Sparkles className="w-3.5 h-3.5" />
-            Live Application Simulator
-          </div>
-          
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-primary-text tracking-tight">
-            Designed for clarity. <br />
-            <span className="text-accent-emerald">Powered by continuous context.</span>
-          </h2>
-
-          <p className="text-base sm:text-lg text-secondary-text font-light leading-relaxed">
-            Experience the real Medhee user interface. Click through the 4 live screens below or interact with the smartphone controls directly.
+    <section id="app-showcase" className="relative py-16 md:py-20 px-6 md:px-12 bg-bg-warm border-t border-border-light">
+      <div className="max-w-7xl mx-auto space-y-10">
+        <div className="text-center space-y-3 max-w-2xl mx-auto">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-primary-text tracking-tight">The everyday app.</h2>
+          <p className="text-base sm:text-lg text-secondary-text leading-relaxed">
+            Medicines, reminders, history and diet — the screens you'll use most. Tap around, they work.
           </p>
         </div>
 
-        {/* Screen Switcher Tabs */}
-        <div className="flex flex-wrap justify-center gap-2 p-1.5 bg-white border border-border-light rounded-2xl max-w-4xl mx-auto shadow-2xs">
-          {[
-            { key: 'home', label: 'Home Dashboard', icon: Home, desc: 'Schedule & Safety' },
-            { key: 'timeline', label: 'Health Timeline', icon: Activity, desc: 'Symptom Records' },
-            { key: 'interaction', label: 'Interaction Radar', icon: ShieldAlert, desc: 'Drug Matrix' },
-            { key: 'diet', label: 'Dietary Plan', icon: Apple, desc: 'Food Guidance' },
-          ].map((item) => {
+        <div className="flex gap-2 p-1.5 bg-white border border-border-light rounded-2xl max-w-4xl mx-auto overflow-x-auto no-scrollbar" role="tablist" aria-label="App screens">
+          {SCREENS.map((item) => {
             const Icon = item.icon;
-            const isActive = activeScreen === item.key;
+            const selected = screen === item.key;
             return (
               <button
                 key={item.key}
-                onClick={() => {
-                  setActiveScreen(item.key as ScreenKey);
-                  setIsAutoPlay(false);
-                }}
-                className={`flex-1 min-w-[170px] flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-medium transition-all duration-200 ${
-                  isActive 
-                    ? 'bg-accent-emerald text-white shadow-xs font-semibold' 
-                    : 'text-secondary-text hover:text-primary-text hover:bg-bg-warm'
+                role="tab"
+                aria-selected={selected}
+                aria-controls="showcase-panel"
+                onClick={() => setScreen(item.key)}
+                className={`flex-1 min-w-[150px] flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm transition-colors ${
+                  selected ? 'bg-accent-emerald text-white font-semibold' : 'text-secondary-text hover:text-primary-text hover:bg-bg-warm'
                 }`}
               >
-                <div className={`p-1.5 rounded-lg flex-shrink-0 ${isActive ? 'bg-white/20 text-white' : 'bg-bg-warm text-secondary-text'}`}>
-                  <Icon className="w-4 h-4" />
-                </div>
-                <div className="text-left leading-tight truncate">
-                  <p className="font-bold truncate">{item.label}</p>
-                  <p className={`text-[10px] truncate ${isActive ? 'text-white/80' : 'text-secondary-text'}`}>{item.desc}</p>
-                </div>
+                <Icon className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                <span className="text-left leading-tight">
+                  <span className="block font-bold">{item.label}</span>
+                  <span className={`block text-xs ${selected ? 'text-white/85' : 'text-secondary-text'}`}>{item.desc}</span>
+                </span>
               </button>
             );
           })}
         </div>
 
-        {/* Main Showcase Grid: Left Info Panel + Center Smartphone + Right Interactive Controls */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          
-          {/* Left Context Explanation */}
-          <div className="lg:col-span-3">
-            <div className="bg-white border border-border-light rounded-2xl p-6 shadow-2xs space-y-5 text-left">
-              <AnimatePresence mode="wait">
-                {activeScreen === 'home' && (
-                  <motion.div
-                    key="home-info"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="space-y-3"
-                  >
-                    <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-accent-soft text-accent-emerald text-xs font-bold font-mono">
-                      <span>01</span>
-                      <span className="w-1 h-1 rounded-full bg-accent-emerald" />
-                      <span>MODULE</span>
-                    </div>
-                    <h3 className="text-lg font-bold text-primary-text leading-tight">Daily Health Hub</h3>
-                    <p className="text-xs text-secondary-text leading-relaxed font-light">
-                      Clear visibility over daily dosages, upcoming reminders, and quick safety status. Never miss a pill or wonder if a medicine is safe.
-                    </p>
-                    <div className="p-3 rounded-xl bg-bg-warm border border-border-light text-xs space-y-1">
-                      <p className="font-bold text-primary-text flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-accent-emerald" />
-                        Live Progress Counter
-                      </p>
-                      <p className="text-[11px] text-secondary-text font-light">Click "Take Now" on the phone screen to simulate marking doses taken.</p>
-                    </div>
-                  </motion.div>
-                )}
-
-                {activeScreen === 'timeline' && (
-                  <motion.div
-                    key="timeline-info"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="space-y-3"
-                  >
-                    <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-accent-soft text-accent-emerald text-xs font-bold font-mono">
-                      <span>02</span>
-                      <span className="w-1 h-1 rounded-full bg-accent-emerald" />
-                      <span>MODULE</span>
-                    </div>
-                    <h3 className="text-lg font-bold text-primary-text leading-tight">Unified Health Timeline</h3>
-                    <p className="text-xs text-secondary-text leading-relaxed font-light">
-                      Chronological record of every symptom, assessment, and resolution. Medhee groups events by date and triage risk level.
-                    </p>
-                    <div className="p-3 rounded-xl bg-bg-warm border border-border-light text-xs space-y-1">
-                      <p className="font-bold text-primary-text flex items-center gap-1.5">
-                        <Activity className="w-3.5 h-3.5 text-accent-emerald" />
-                        Expandable History
-                      </p>
-                      <p className="text-[11px] text-secondary-text font-light">Click "View Details" on any timeline event card to expand notes and advice.</p>
-                    </div>
-                  </motion.div>
-                )}
-
-                {activeScreen === 'interaction' && (
-                  <motion.div
-                    key="interaction-info"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="space-y-3"
-                  >
-                    <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold font-mono">
-                      <span>03</span>
-                      <span className="w-1 h-1 rounded-full bg-amber-600" />
-                      <span>MODULE</span>
-                    </div>
-                    <h3 className="text-lg font-bold text-primary-text leading-tight">Drug Interaction Radar</h3>
-                    <p className="text-xs text-secondary-text leading-relaxed font-light">
-                      Automatic cross-checking whenever multiple drugs are prescribed. Displays risk levels, warning symptoms, and safety timelines.
-                    </p>
-                    <div className="p-3 rounded-xl bg-bg-warm border border-border-light text-xs space-y-1">
-                      <p className="font-bold text-primary-text flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 text-amber-700" />
-                        Time-Decay Curve
-                      </p>
-                      <p className="text-[11px] text-secondary-text font-light">Tap timestamps on the phone's timeline stepper to observe risk changes over 12 hours.</p>
-                    </div>
-                  </motion.div>
-                )}
-
-                {activeScreen === 'diet' && (
-                  <motion.div
-                    key="diet-info"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="space-y-3"
-                  >
-                    <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-accent-soft text-accent-emerald text-xs font-bold font-mono">
-                      <span>04</span>
-                      <span className="w-1 h-1 rounded-full bg-accent-emerald" />
-                      <span>MODULE</span>
-                    </div>
-                    <h3 className="text-lg font-bold text-primary-text leading-tight">Personalized Dietary Plan</h3>
-                    <p className="text-xs text-secondary-text leading-relaxed font-light">
-                      Food recommendations tailored to active conditions and active prescription drug interactions (e.g. GERD, Diabetes Type II).
-                    </p>
-                    <div className="p-3 rounded-xl bg-bg-warm border border-border-light text-xs space-y-1">
-                      <p className="font-bold text-primary-text flex items-center gap-1.5">
-                        <Apple className="w-3.5 h-3.5 text-accent-emerald" />
-                        Eat vs. Avoid Categories
-                      </p>
-                      <p className="text-[11px] text-secondary-text font-light">Toggle between "Eat" and "Avoid" tabs on the device to see safe vs restricted foods.</p>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Auto Play Toggle */}
-              <div className="pt-3 border-t border-border-light flex items-center justify-between">
-                <span className="text-xs text-secondary-text font-medium">Auto-Switch</span>
-                <button
-                  onClick={() => setIsAutoPlay(!isAutoPlay)}
-                  className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-all ${
-                    isAutoPlay ? 'bg-accent-soft text-accent-emerald border border-accent-soft' : 'bg-bg-warm text-secondary-text border border-border-light'
-                  }`}
-                >
-                  {isAutoPlay ? 'Playing (8s)' : 'Paused'}
-                </button>
-              </div>
-            </div>
+        <div id="showcase-panel" role="tabpanel" className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          <div className="lg:col-span-5 order-2 lg:order-1">
+            <AnimatePresence mode="wait">
+              <motion.div key={screen} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-4 text-left">
+                <h3 className="font-display text-2xl sm:text-3xl font-bold text-primary-text leading-tight">{info.title}</h3>
+                <p className="text-base text-secondary-text leading-relaxed">{info.body}</p>
+                <p className="text-sm text-primary-text p-4 rounded-2xl bg-white border border-border-light">
+                  <span className="font-semibold">Try it:</span> {info.try}
+                </p>
+              </motion.div>
+            </AnimatePresence>
           </div>
 
-          {/* Center Column: Phone Frame with Live UI */}
-          <div className="lg:col-span-6 flex justify-center items-center">
-            
-            {/* iPhone Shell */}
-            <div className="relative w-full max-w-[360px] sm:max-w-[380px] h-[720px] bg-[#0c0c0d] rounded-[52px] p-[10px] shadow-[0_30px_70px_-15px_rgba(0,0,0,0.35)] border-4 border-[#2d2d30] overflow-hidden flex flex-col select-none">
-              
-              {/* Dynamic Island & Notch */}
-              <div className="absolute top-3 left-1/2 -translate-x-1/2 w-28 h-6 bg-black rounded-full z-40 flex items-center justify-between px-3">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#1a1a1d]" />
-                <div className="w-1.5 h-1.5 rounded-full bg-[#0a5c43]/80 animate-pulse" />
-              </div>
+          <div className="lg:col-span-7 order-1 lg:order-2 flex justify-center">
+            <div className="relative w-full max-w-[360px] h-[700px] bg-[#0c0c0d] rounded-[52px] p-[10px] shadow-[0_30px_70px_-15px_rgba(0,0,0,0.35)] border-4 border-[#2d2d30] overflow-hidden flex flex-col select-none">
+              <div aria-hidden="true" className="absolute top-3 left-1/2 -translate-x-1/2 w-28 h-6 bg-black rounded-full z-40" />
 
-              {/* Status Bar */}
-              <div className="absolute top-3 left-7 right-7 flex justify-between items-center text-[11px] font-semibold text-gray-800 z-30 pointer-events-none">
-                <span>1:30</span>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[9px]">5G</span>
-                  <div className="w-4 h-2 border border-gray-800 rounded-sm p-0.5 flex items-center">
-                    <div className="w-full h-full bg-gray-800 rounded-2xs" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Toast Notification Container */}
               <AnimatePresence>
-                {toastMessage && (
+                {toast && (
                   <motion.div
-                    initial={{ opacity: 0, y: -20, scale: 0.9 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -20, scale: 0.9 }}
-                    className="absolute top-12 left-4 right-4 z-50 bg-primary-text text-white text-[11px] px-3.5 py-2 rounded-xl shadow-lg flex items-center gap-2 border border-gray-700"
+                    role="status"
+                    initial={{ opacity: 0, y: -16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -16 }}
+                    className="absolute top-12 left-4 right-4 z-50 bg-primary-text text-white text-xs px-3.5 py-2 rounded-xl shadow-lg flex items-center gap-2"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-accent-emerald flex-shrink-0" />
-                    <span className="truncate">{toastMessage}</span>
+                    <Check className="w-4 h-4 text-emerald-300 flex-shrink-0" aria-hidden="true" />
+                    {toast}
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              {/* Screen Body Container */}
-              <div className="flex-1 bg-white rounded-[42px] overflow-hidden pt-10 flex flex-col justify-between relative">
-                
-                {/* SCREEN 1: HOME DASHBOARD */}
-                {activeScreen === 'home' && (
-                  <motion.div 
-                    initial={{ opacity: 0 }} 
-                    animate={{ opacity: 1 }} 
-                    exit={{ opacity: 0 }}
-                    className="flex-1 flex flex-col overflow-y-auto no-scrollbar p-4 space-y-4 text-left"
-                  >
-                    {/* Header */}
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-md bg-bg-warm border border-border-light flex items-center justify-center">
-                          <div className="w-3 h-0.5 bg-secondary-text rounded-full" />
+              <div className="flex-1 bg-white rounded-[42px] overflow-hidden pt-10 flex flex-col">
+                <div className="flex-1 overflow-y-auto no-scrollbar p-4 space-y-4 text-left">
+                  {/* HOME */}
+                  {screen === 'home' && (
+                    <>
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="text-base font-bold text-primary-text">Good evening, Abhay</p>
+                          <p className="text-[11px] text-secondary-text">Tuesday, 9 June</p>
                         </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="relative">
-                          <Bell className="w-4 h-4 text-primary-text" />
-                          <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-accent-red rounded-full" />
-                        </div>
-                        <img 
-                          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80" 
-                          alt="Avatar" 
-                          className="w-7 h-7 rounded-full object-cover border border-border-light"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Greeting */}
-                    <div>
-                      <h3 className="text-base font-bold text-primary-text leading-tight">
-                        Good evening, <span className="text-accent-emerald">{activeMember}!</span> 👋
-                      </h3>
-                      <p className="text-[10px] text-secondary-text">Let's keep you healthy and safe.</p>
-                    </div>
-
-                    {/* Profile switcher */}
-                    <div className="flex items-center gap-2">
-                      <button 
-                        onClick={() => setActiveMember('Abhay')}
-                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border transition-colors ${
-                          activeMember === 'Abhay' ? 'bg-accent-soft text-accent-emerald border-accent-soft' : 'bg-bg-warm text-secondary-text border-border-light'
-                        }`}
-                      >
-                        <span>Abhay</span>
-                        <Check className="w-3 h-3 text-accent-emerald" />
-                      </button>
-                      <button 
-                        onClick={() => showToast('Family Profile Switcher Opened')}
-                        className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-medium text-secondary-text border border-dashed border-border-light bg-bg-warm hover:bg-white"
-                      >
-                        <Plus className="w-3 h-3" />
-                        <span>Add Member</span>
-                      </button>
-                    </div>
-
-                    {/* Safety Banner */}
-                    <div className="bg-accent-soft/60 border border-accent-soft rounded-2xl p-3 space-y-2">
-                      <div className="flex items-center gap-2 text-accent-emerald">
-                        <ShieldAlert className="w-4 h-4 text-accent-emerald" />
-                        <div className="text-[11px] font-bold">You're safe today</div>
-                      </div>
-                      <p className="text-[9px] text-accent-emerald font-medium">No severe drug interactions detected in your active schedule.</p>
-
-                      {/* Meds progress */}
-                      <div className="pt-1 space-y-1">
-                        <div className="flex justify-between text-[10px]">
-                          <span className="text-secondary-text font-medium">Today's progress</span>
-                          <span className="font-bold text-primary-text">{takenCount}/2 meds taken ({progressPercent}%)</span>
-                        </div>
-                        <div className="w-full h-1.5 bg-accent-soft rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-accent-emerald transition-all duration-500 rounded-full" 
-                            style={{ width: `${progressPercent}%` }}
-                          />
+                        <div className="flex items-center gap-3">
+                          <Bell className="w-4 h-4 text-primary-text" aria-hidden="true" />
+                          <span className="w-8 h-8 rounded-full bg-teal-100 text-teal-800 flex items-center justify-center text-xs font-bold" aria-hidden="true">
+                            A
+                          </span>
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between text-[9px] text-accent-emerald pt-1 border-t border-accent-soft">
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-accent-emerald" />
-                          Next: Levocetirizine • 8:00 AM
-                        </span>
-                        <ChevronRight className="w-3 h-3 text-accent-emerald" />
-                      </div>
-                    </div>
-
-                    {/* Diet Banner */}
-                    <div className="rounded-2xl p-3 text-white bg-primary-text flex items-center justify-between gap-2 shadow-sm border border-border-light">
-                      <div className="space-y-1">
-                        <p className="text-[11px] font-bold leading-tight">Your Diet, Your Medicine's Best Friend</p>
-                        <p className="text-[9px] opacity-80 font-light">Personalized diet tips aligned with your prescriptions.</p>
-                        <button 
-                          onClick={() => setActiveScreen('diet')}
-                          className="mt-1 px-2.5 py-1 bg-accent-emerald text-white rounded-lg text-[9px] font-bold hover:bg-emerald-700 transition-colors"
-                        >
-                          View Diet Plan &gt;
-                        </button>
-                      </div>
-                      <div className="w-10 h-10 rounded-xl bg-white/10 p-1 flex items-center justify-center flex-shrink-0">
-                        <Apple className="w-6 h-6 text-white" />
-                      </div>
-                    </div>
-
-                    {/* Today's Schedule */}
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center text-[11px]">
-                        <span className="font-bold text-primary-text">Today's Schedule</span>
-                        <button onClick={() => showToast('Full schedule view')} className="text-accent-emerald font-semibold text-[10px] hover:underline">View all &gt;</button>
-                      </div>
-
-                      {/* Dose 1 */}
-                      <div className="bg-bg-warm border border-border-light rounded-xl p-2.5 flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${medsTaken.med1 ? 'bg-accent-emerald text-white' : 'bg-accent-soft text-accent-emerald'}`}>
-                            <Pill className="w-4 h-4" />
+                      <div className="bg-accent-soft border border-emerald-100 rounded-2xl p-3 space-y-2">
+                        <p className="text-xs font-bold text-accent-emerald flex items-center gap-1.5">
+                          <ShieldCheck className="w-4 h-4" aria-hidden="true" />
+                          No serious interactions in your medicines
+                        </p>
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-[11px]">
+                            <span className="text-secondary-text">Today</span>
+                            <span className="font-bold text-primary-text">
+                              {takenCount}/{doses.length} taken
+                            </span>
                           </div>
-                          <div>
-                            <p className="text-[11px] font-bold text-primary-text leading-snug">Levocetirizine + Montelukast</p>
-                            <p className="text-[9px] text-secondary-text">09:30 AM • 1 dose after food</p>
+                          <div className="w-full h-1.5 bg-white rounded-full overflow-hidden" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Doses taken today">
+                            <div className="h-full bg-accent-emerald transition-all duration-500 rounded-full" style={{ width: `${pct}%` }} />
                           </div>
                         </div>
-                        <button
-                          onClick={() => toggleMed('med1')}
-                          className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-all ${
-                            medsTaken.med1 ? 'bg-accent-emerald text-white' : 'bg-primary-text text-white hover:bg-accent-emerald'
-                          }`}
-                        >
-                          {medsTaken.med1 ? '✓ Taken' : 'Take now'}
-                        </button>
                       </div>
 
-                      {/* Dose 2 */}
-                      <div className="bg-bg-warm border border-border-light rounded-xl p-2.5 flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${medsTaken.med2 ? 'bg-accent-emerald text-white' : 'bg-accent-soft text-accent-emerald'}`}>
-                            <Pill className="w-4 h-4" />
-                          </div>
-                          <div>
-                            <p className="text-[11px] font-bold text-primary-text leading-snug">Pantoprazole + Domperidone</p>
-                            <p className="text-[9px] text-secondary-text">02:00 PM • 30 min before meal</p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => toggleMed('med2')}
-                          className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-all ${
-                            medsTaken.med2 ? 'bg-accent-emerald text-white' : 'bg-primary-text text-white hover:bg-accent-emerald'
-                          }`}
-                        >
-                          {medsTaken.med2 ? '✓ Taken' : 'Take'}
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Quick Actions Grid */}
-                    <div className="space-y-1.5 pt-1">
-                      <p className="text-[10px] font-bold text-secondary-text uppercase tracking-wider">Quick Actions</p>
-                      <div className="grid grid-cols-5 gap-1.5 text-center">
-                        {[
-                          { icon: Camera, label: 'Scan', action: 'Camera scanner ready' },
-                          { icon: Upload, label: 'Report', action: 'Upload lab report' },
-                          { icon: MessageSquare, label: 'Chat', action: 'Opening Medhee Chat' },
-                          { icon: Bell, label: 'Alerts', action: 'Reminder preferences' },
-                          { icon: ShieldAlert, label: 'SOS', action: 'Emergency contact line' },
-                        ].map((act, i) => {
-                          const Icon = act.icon;
+                      <div className="space-y-2">
+                        <p className="text-xs font-bold text-primary-text">Today's medicines</p>
+                        {doses.map((d) => {
+                          const done = !!taken[d.id];
                           return (
-                            <button 
-                              key={i} 
-                              onClick={() => showToast(act.action)}
-                              className="flex flex-col items-center gap-1 p-1.5 rounded-xl bg-bg-warm border border-border-light hover:bg-white transition-colors"
-                            >
-                              <div className="w-7 h-7 rounded-lg bg-accent-soft text-accent-emerald flex items-center justify-center">
-                                <Icon className="w-3.5 h-3.5" />
+                            <div key={d.id} className="bg-bg-warm border border-border-light rounded-xl p-2.5 flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <span className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${done ? 'bg-accent-emerald text-white' : 'bg-accent-soft text-accent-emerald'}`}>
+                                  <Pill className="w-4 h-4" aria-hidden="true" />
+                                </span>
+                                <div className="min-w-0">
+                                  <p className="text-xs font-bold text-primary-text truncate">{d.name}</p>
+                                  <p className="text-[11px] text-secondary-text">{d.time}</p>
+                                </div>
                               </div>
-                              <span className="text-[8px] font-medium text-primary-text">{act.label}</span>
-                            </button>
+                              <button
+                                onClick={() => toggleDose(d.id)}
+                                aria-pressed={done}
+                                className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-colors flex-shrink-0 ${
+                                  done ? 'bg-accent-emerald text-white' : 'bg-primary-text text-white hover:bg-accent-emerald'
+                                }`}
+                              >
+                                {done ? 'Taken' : 'Take'}
+                              </button>
+                            </div>
                           );
                         })}
                       </div>
-                    </div>
 
-                    {/* AI Assistant Bottom Banner */}
-                    <div className="p-2.5 rounded-2xl bg-bg-warm border border-border-light flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-accent-emerald text-white flex items-center justify-center">
-                          <Sparkles className="w-3.5 h-3.5" />
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-bold text-primary-text">Hi! I'm Medhee AI ✨</p>
-                          <p className="text-[8px] text-secondary-text">Ask anything about your health context</p>
-                        </div>
-                      </div>
-                      <Mic className="w-4 h-4 text-accent-emerald" />
-                    </div>
-
-                  </motion.div>
-                )}
-
-                {/* SCREEN 2: HEALTH TIMELINE */}
-                {activeScreen === 'timeline' && (
-                  <motion.div 
-                    initial={{ opacity: 0 }} 
-                    animate={{ opacity: 1 }} 
-                    exit={{ opacity: 0 }}
-                    className="flex-1 flex flex-col overflow-y-auto no-scrollbar p-4 space-y-4 text-left"
-                  >
-                    {/* Header */}
-                    <div className="flex justify-between items-center pb-2 border-b border-border-light">
-                      <h3 className="text-xs font-bold text-primary-text flex items-center gap-1.5">
-                        <Activity className="w-4 h-4 text-accent-emerald" />
-                        Health Timeline
-                      </h3>
-                      <button onClick={() => showToast('Timeline options')} className="text-[10px] text-secondary-text flex items-center gap-1 bg-bg-warm border border-border-light px-2 py-0.5 rounded-md">
-                        June 2026 ▼
+                      <button
+                        onClick={() => setScreen('diet')}
+                        className="w-full rounded-2xl p-3 text-white bg-primary-text flex items-center justify-between gap-2 text-left"
+                      >
+                        <span>
+                          <span className="block text-xs font-bold">Your diet plan</span>
+                          <span className="block text-[11px] opacity-80">Matched to your medicines</span>
+                        </span>
+                        <ChevronRight className="w-4 h-4" aria-hidden="true" />
                       </button>
-                    </div>
 
-                    {/* Top Stats Widget */}
-                    <div className="bg-bg-warm border border-border-light rounded-2xl p-3 flex justify-between items-center">
-                      <div className="space-y-0.5">
-                        <p className="text-[10px] font-bold text-primary-text">Your Health Journey</p>
-                        <p className="text-[8px] text-secondary-text">Track, understand and improve health.</p>
-                      </div>
-                      <div className="flex gap-3 text-center">
-                        <div>
-                          <p className="text-xs font-bold text-accent-emerald">2</p>
-                          <p className="text-[7px] text-secondary-text uppercase font-semibold">Assessments</p>
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-accent-emerald">2</p>
-                          <p className="text-[7px] text-secondary-text uppercase font-semibold">Active</p>
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-primary-text">0</p>
-                          <p className="text-[7px] text-secondary-text uppercase font-semibold">Advised</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Timeline List */}
-                    <div className="space-y-3 relative pl-4 border-l-2 border-border-light ml-2">
-                      
-                      {/* Item 1 */}
-                      <div className="relative">
-                        <div className="absolute -left-[23px] top-1.5 w-3.5 h-3.5 rounded-full bg-accent-emerald border-2 border-white shadow-xs" />
-                        <div className="bg-white border border-border-light rounded-xl p-2.5 shadow-2xs space-y-1.5">
-                          <div className="flex justify-between items-center">
-                            <span className="text-[9px] font-bold text-accent-emerald bg-accent-soft px-2 py-0.5 rounded-full">Low Risk • Active</span>
-                            <span className="text-[8px] text-secondary-text">9 Jun (Today) 10:30 AM</span>
-                          </div>
-                          <h4 className="text-xs font-bold text-primary-text">Loose motion</h4>
-                          <p className="text-[9px] text-secondary-text leading-normal font-light">
-                            Experiencing loose motion with abdominal cramping following consumption of street food.
-                          </p>
-                          <div className="flex items-center justify-between text-[9px] pt-1 border-t border-border-light text-accent-emerald font-semibold">
-                            <span>📈 Symptoms improving</span>
-                            <button 
-                              onClick={() => setExpandedTimelineId(expandedTimelineId === '1' ? null : '1')}
-                              className="text-accent-emerald hover:underline"
+                      <div className="space-y-2">
+                        <p className="text-xs font-bold text-primary-text">Quick actions</p>
+                        <div className="grid grid-cols-4 gap-2 text-center">
+                          {[
+                            { icon: Camera, label: 'Scan' },
+                            { icon: Upload, label: 'Report' },
+                            { icon: MessageSquare, label: 'Chat' },
+                            { icon: Mic, label: 'AI nurse' },
+                          ].map(({ icon: Icon, label }) => (
+                            <button
+                              key={label}
+                              onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+                              className="flex flex-col items-center gap-1 p-2 rounded-xl bg-bg-warm border border-border-light hover:bg-white transition-colors"
                             >
-                              {expandedTimelineId === '1' ? 'Hide Details' : 'View Details >'}
+                              <span className="w-8 h-8 rounded-lg bg-accent-soft text-accent-emerald flex items-center justify-center">
+                                <Icon className="w-4 h-4" aria-hidden="true" />
+                              </span>
+                              <span className="text-[11px] font-medium text-primary-text">{label}</span>
                             </button>
-                          </div>
-
-                          {expandedTimelineId === '1' && (
-                            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="pt-2 border-t border-border-light text-[9px] text-secondary-text space-y-1">
-                              <p className="font-semibold text-primary-text">Care Advice:</p>
-                              <p>• Stay hydrated with ORS solution</p>
-                              <p>• Continue prescribed Pantoprazole before meals</p>
-                            </motion.div>
-                          )}
+                          ))}
                         </div>
                       </div>
+                    </>
+                  )}
 
-                      {/* Item 2 */}
-                      <div className="relative">
-                        <div className="absolute -left-[23px] top-1.5 w-3.5 h-3.5 rounded-full bg-accent-amber border-2 border-white shadow-xs" />
-                        <div className="bg-white border border-border-light rounded-xl p-2.5 shadow-2xs space-y-1.5">
-                          <div className="flex justify-between items-center">
-                            <span className="text-[9px] font-bold text-amber-800 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full">Moderate Risk • Monitoring</span>
-                            <span className="text-[8px] text-secondary-text">8 Jun 08:15 PM</span>
-                          </div>
-                          <h4 className="text-xs font-bold text-primary-text">Headache</h4>
-                          <p className="text-[9px] text-secondary-text leading-normal font-light">
-                            Headache and mild fatigue reported after poor sleep and long screen time.
-                          </p>
-                          <div className="flex items-center justify-between text-[9px] pt-1 border-t border-border-light">
-                            <span className="text-accent-amber font-semibold">👀 Monitoring for 24h</span>
-                            <button 
-                              onClick={() => setExpandedTimelineId(expandedTimelineId === '2' ? null : '2')}
-                              className="text-accent-emerald hover:underline font-semibold"
-                            >
-                              {expandedTimelineId === '2' ? 'Hide Details' : 'View Details >'}
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Item 3 */}
-                      <div className="relative">
-                        <div className="absolute -left-[23px] top-1.5 w-3.5 h-3.5 rounded-full bg-accent-emerald border-2 border-white shadow-xs" />
-                        <div className="bg-white border border-border-light rounded-xl p-2.5 shadow-2xs space-y-1">
-                          <div className="flex justify-between items-center">
-                            <span className="text-[9px] font-bold text-primary-text bg-bg-warm border border-border-light px-2 py-0.5 rounded-full">Resolved</span>
-                            <span className="text-[8px] text-secondary-text">5 Jun 06:40 PM</span>
-                          </div>
-                          <h4 className="text-xs font-bold text-primary-text">Fever</h4>
-                          <p className="text-[9px] text-secondary-text">Treated and symptoms completely resolved.</p>
-                        </div>
-                      </div>
-
-                    </div>
-
-                    {/* Bottom Habit Banner */}
-                    <div className="p-2.5 rounded-xl bg-bg-warm border border-border-light flex items-center justify-between">
-                      <span className="text-[9px] font-bold text-primary-text">Keep building healthy habits</span>
-                      <button onClick={() => showToast('Opening Insights')} className="text-[9px] font-bold text-accent-emerald bg-white px-2 py-1 rounded-md border border-border-light hover:bg-bg-warm">View Insights &gt;</button>
-                    </div>
-
-                  </motion.div>
-                )}
-
-                {/* SCREEN 3: INTERACTION RADAR */}
-                {activeScreen === 'interaction' && (
-                  <motion.div 
-                    initial={{ opacity: 0 }} 
-                    animate={{ opacity: 1 }} 
-                    exit={{ opacity: 0 }}
-                    className="flex-1 flex flex-col overflow-y-auto no-scrollbar p-4 space-y-3 text-left"
-                  >
-                    {/* Header */}
-                    <div className="flex justify-between items-center pb-2 border-b border-border-light">
-                      <h3 className="text-xs font-bold text-primary-text">Interaction Details</h3>
-                      <Share2 className="w-3.5 h-3.5 text-secondary-text" />
-                    </div>
-
-                    {/* Risk Badge */}
-                    <div className="bg-amber-50/80 border border-amber-200/80 rounded-2xl p-3 text-center space-y-1.5">
-                      <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 font-bold text-[9px] uppercase tracking-wider">
-                        Moderate Risk
-                      </span>
-                      <h4 className="text-xs font-bold text-primary-text">Livobid 10mg + FOLIOS NVP</h4>
-                      <p className="text-[9px] text-amber-900">This combination may increase drowsiness and dizziness.</p>
-
-                      {/* Animated Gauge scale */}
-                      <div className="pt-2 space-y-1">
-                        <div className="flex justify-between text-[8px] font-bold text-secondary-text">
-                          <span className="text-accent-emerald">Low</span>
-                          <span className="text-amber-800">Moderate</span>
-                          <span className="text-accent-red">High</span>
-                        </div>
-                        <div className="w-full h-2 rounded-full bg-gradient-to-r from-accent-emerald via-amber-400 to-accent-red relative">
-                          <div className="absolute top-1/2 left-[50%] -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-white border-2 border-amber-600 shadow-sm" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Pills matchup */}
-                    <div className="flex items-center justify-center gap-2 text-[10px]">
-                      <div className="px-2.5 py-1 rounded-xl bg-accent-soft border border-accent-soft font-bold text-accent-emerald flex items-center gap-1">
-                        <Pill className="w-3 h-3 text-accent-emerald" />
-                        Livobid 10mg
-                      </div>
-                      <span className="font-bold text-secondary-text">+</span>
-                      <div className="px-2.5 py-1 rounded-xl bg-red-50 border border-red-100 font-bold text-accent-red flex items-center gap-1">
-                        <Pill className="w-3 h-3 text-accent-red" />
-                        FOLIOS NVP
-                      </div>
-                    </div>
-
-                    {/* Why this matters */}
-                    <div className="p-2.5 rounded-xl bg-bg-warm border border-border-light space-y-1">
-                      <p className="text-[10px] font-bold text-primary-text flex items-center gap-1">
-                        <Info className="w-3.5 h-3.5 text-accent-emerald" />
-                        Why this matters
-                      </p>
-                      <p className="text-[9px] text-secondary-text leading-normal font-light">
-                        Both medicines cause central nervous system depression. Taking them simultaneously increases sleepiness and reduces alertness.
-                      </p>
-                    </div>
-
-                    {/* Time Stepper */}
-                    <div className="p-2.5 rounded-xl bg-bg-warm border border-border-light space-y-2">
-                      <p className="text-[9px] font-bold text-primary-text uppercase tracking-wider">Interaction Risk Timeline</p>
-                      <div className="flex justify-between items-center text-[8px] text-secondary-text">
+                  {/* HISTORY */}
+                  {screen === 'history' && (
+                    <>
+                      <p className="text-base font-bold text-primary-text">Health history</p>
+                      <ol className="space-y-3 relative pl-4 border-l-2 border-border-light ml-1">
                         {[
-                          { h: 8, label: '8:00 AM', status: 'Taken' },
-                          { h: 9, label: '9:00 AM', status: 'Starts' },
-                          { h: 12, label: '12:00 PM', status: 'Peak Risk' },
-                          { h: 18, label: '6:00 PM', status: 'Decreases' }
-                        ].map((t) => (
-                          <button 
-                            key={t.h} 
-                            onClick={() => setSelectedTimelineHour(t.h)}
-                            className={`flex flex-col items-center gap-0.5 px-1.5 py-1 rounded-md transition-all ${
-                              selectedTimelineHour === t.h ? 'bg-accent-emerald text-white font-bold shadow-xs' : 'bg-white text-secondary-text border border-border-light'
-                            }`}
-                          >
-                            <span>{t.label}</span>
-                            <span className="text-[7px] opacity-80">{t.status}</span>
-                          </button>
+                          {
+                            id: '1',
+                            dot: 'bg-accent-emerald',
+                            badge: 'Mild · getting better',
+                            badgeTone: 'text-accent-emerald bg-accent-soft',
+                            when: 'Today, 10:30 AM',
+                            title: 'Loose motions',
+                            text: 'Loose motions and stomach cramps after eating street food.',
+                            advice: ['Drink ORS through the day', 'Keep taking Pantoprazole before meals', 'See a doctor if there is blood or high fever'],
+                          },
+                          {
+                            id: '2',
+                            dot: 'bg-accent-amber',
+                            badge: 'Moderate · watching',
+                            badgeTone: 'text-amber-800 bg-amber-50',
+                            when: '8 June, 8:15 PM',
+                            title: 'Headache',
+                            text: 'Headache and tiredness after poor sleep and long screen time.',
+                            advice: ['Rest and drink water', 'Paracetamol is fine with your current medicines'],
+                          },
+                          {
+                            id: '3',
+                            dot: 'bg-slate-300',
+                            badge: 'Resolved',
+                            badgeTone: 'text-secondary-text bg-bg-warm',
+                            when: '5 June',
+                            title: 'Fever',
+                            text: 'Better after two days of rest and paracetamol.',
+                            advice: [],
+                          },
+                        ].map((e) => (
+                          <li key={e.id} className="relative">
+                            <span className={`absolute -left-[23px] top-2 w-3.5 h-3.5 rounded-full ${e.dot} border-2 border-white`} aria-hidden="true" />
+                            <div className="bg-white border border-border-light rounded-xl p-3 space-y-1.5">
+                              <div className="flex justify-between items-center gap-2">
+                                <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${e.badgeTone}`}>{e.badge}</span>
+                                <span className="text-[11px] text-secondary-text">{e.when}</span>
+                              </div>
+                              <p className="text-sm font-bold text-primary-text">{e.title}</p>
+                              <p className="text-xs text-secondary-text leading-snug">{e.text}</p>
+                              {e.advice.length > 0 && (
+                                <button
+                                  onClick={() => setOpenEntry(openEntry === e.id ? null : e.id)}
+                                  aria-expanded={openEntry === e.id}
+                                  className="text-xs font-semibold text-accent-emerald hover:underline"
+                                >
+                                  {openEntry === e.id ? 'Hide details' : 'Details'}
+                                </button>
+                              )}
+                              {openEntry === e.id && e.advice.length > 0 && (
+                                <ul className="pt-2 border-t border-border-light text-xs text-secondary-text space-y-1">
+                                  {e.advice.map((a) => (
+                                    <li key={a}>• {a}</li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+                          </li>
                         ))}
+                      </ol>
+                    </>
+                  )}
+
+                  {/* INTERACTION */}
+                  {screen === 'interaction' && (
+                    <>
+                      <p className="text-base font-bold text-primary-text">Interaction check</p>
+                      <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 space-y-1.5 text-center">
+                        <span className="inline-block px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 font-bold text-[11px]">Moderate</span>
+                        <p className="text-sm font-bold text-primary-text">Cetirizine + Alprazolam</p>
+                        <p className="text-xs text-amber-900">Taking these together can make you much sleepier than usual.</p>
                       </div>
-                    </div>
 
-                    {/* Emergency Seek Help Banner */}
-                    <div className="p-2.5 rounded-xl bg-red-50 border border-red-200 text-accent-red text-[9px] space-y-1">
-                      <p className="font-bold flex items-center gap-1">
-                        <ShieldAlert className="w-3.5 h-3.5 text-accent-red" />
-                        Seek immediate help if:
-                      </p>
-                      <div className="flex flex-wrap gap-1">
-                        <span className="bg-white/80 px-1.5 py-0.5 rounded border border-red-200 text-accent-red font-medium">Difficulty breathing</span>
-                        <span className="bg-white/80 px-1.5 py-0.5 rounded border border-red-200 text-accent-red font-medium">Chest pain</span>
-                        <span className="bg-white/80 px-1.5 py-0.5 rounded border border-red-200 text-accent-red font-medium">Confusion</span>
+                      <div className="p-3 rounded-xl bg-bg-warm border border-border-light space-y-1">
+                        <p className="text-xs font-bold text-primary-text flex items-center gap-1.5">
+                          <Info className="w-4 h-4 text-accent-emerald" aria-hidden="true" />
+                          Why
+                        </p>
+                        <p className="text-xs text-secondary-text leading-snug">Both medicines cause drowsiness. Together, the effect adds up and can slow your reactions.</p>
                       </div>
-                    </div>
 
-                  </motion.div>
-                )}
-
-                {/* SCREEN 4: DIETARY PLAN */}
-                {activeScreen === 'diet' && (
-                  <motion.div 
-                    initial={{ opacity: 0 }} 
-                    animate={{ opacity: 1 }} 
-                    exit={{ opacity: 0 }}
-                    className="flex-1 flex flex-col overflow-y-auto no-scrollbar p-4 space-y-3 text-left"
-                  >
-                    {/* Header */}
-                    <div className="flex justify-between items-center pb-2 border-b border-border-light">
-                      <h3 className="text-xs font-bold text-primary-text flex items-center gap-1.5">
-                        <Apple className="w-4 h-4 text-accent-emerald" />
-                        Dietary Plan
-                      </h3>
-                      <span className="text-[9px] font-bold text-secondary-text bg-bg-warm border border-border-light px-2 py-0.5 rounded-full">Diabetes & GERD</span>
-                    </div>
-
-                    {/* Personalized Banner */}
-                    <div className="bg-bg-warm border border-border-light rounded-2xl p-3 text-center space-y-1">
-                      <Apple className="w-6 h-6 text-accent-emerald mx-auto" />
-                      <h4 className="text-xs font-bold text-primary-text">Your Personalized Diet</h4>
-                      <p className="text-[8px] text-secondary-text">Based on 4 medications and 8 active conditions.</p>
-                      
-                      {/* Count Pills */}
-                      <div className="flex justify-center gap-3 pt-1">
-                        <span className="bg-accent-soft text-accent-emerald px-2.5 py-0.5 rounded-full font-bold text-[9px]">
-                          7 Foods to Eat
-                        </span>
-                        <span className="bg-red-50 text-accent-red border border-red-100 px-2.5 py-0.5 rounded-full font-bold text-[9px]">
-                          2 Foods to Avoid
-                        </span>
+                      <div className="p-3 rounded-xl bg-bg-warm border border-border-light space-y-2">
+                        <p className="text-xs font-bold text-primary-text">When to be careful</p>
+                        <div className="grid grid-cols-4 gap-1" role="group" aria-label="Time of day">
+                          {TIMES.map((t) => (
+                            <button
+                              key={t.h}
+                              onClick={() => setHour(t.h)}
+                              aria-pressed={hour === t.h}
+                              className={`flex flex-col items-center px-1 py-1.5 rounded-lg text-[11px] transition-colors ${
+                                hour === t.h ? 'bg-accent-emerald text-white font-bold' : 'bg-white text-secondary-text border border-border-light'
+                              }`}
+                            >
+                              <span>{t.label}</span>
+                              <span className="text-[10px] opacity-90">{t.note}</span>
+                            </button>
+                          ))}
+                        </div>
+                        <p className="text-xs text-primary-text leading-snug" aria-live="polite">
+                          {TIME_ADVICE[hour]}
+                        </p>
                       </div>
-                    </div>
 
-                    {/* Segmented control */}
-                    <div className="bg-bg-warm p-1 rounded-xl border border-border-light flex text-[10px] font-bold text-secondary-text">
-                      <button 
-                        onClick={() => setDietTab('eat')}
-                        className={`flex-1 py-1 rounded-lg transition-all ${dietTab === 'eat' ? 'bg-accent-emerald text-white shadow-xs' : 'hover:text-primary-text'}`}
-                      >
-                        ✓ Eat (7)
-                      </button>
-                      <button 
-                        onClick={() => setDietTab('avoid')}
-                        className={`flex-1 py-1 rounded-lg transition-all ${dietTab === 'avoid' ? 'bg-accent-red text-white shadow-xs' : 'hover:text-primary-text'}`}
-                      >
-                        ❌ Avoid (2)
-                      </button>
-                    </div>
-
-                    {/* Dish List */}
-                    <div className="space-y-1.5">
-                      {dietTab === 'eat' ? (
-                        [
-                          { name: 'Khichdi with ghee', category: 'Dish', desc: 'Easy digest • Gentle on stomach' },
-                          { name: 'Dal and rice', category: 'Dish', desc: 'Balanced protein' },
-                          { name: 'Idli with sambar', category: 'Dish', desc: 'Steam cooked • Low fat' },
-                          { name: 'Poha with peanuts', category: 'Dish', desc: 'Low glycemic index' },
-                          { name: 'Curd and rice', category: 'Dish', desc: 'Probiotic support' },
-                          { name: 'Boiled vegetables with roti', category: 'Dish', desc: 'High fiber' },
-                          { name: 'Lukewarm milk with honey', category: 'Beverage', desc: 'Soothing bedtime drink' }
-                        ].map((dish, i) => (
-                          <div key={i} className="p-2 rounded-xl bg-white border border-border-light flex items-center justify-between text-[10px]">
-                            <div>
-                              <p className="font-bold text-primary-text">{dish.name}</p>
-                              <p className="text-[8px] text-secondary-text">{dish.category} • {dish.desc}</p>
-                            </div>
-                            <span className="text-[8px] font-bold text-accent-emerald bg-accent-soft px-2 py-0.5 rounded-full">
-                              ✓ Recommended
+                      <div className="p-3 rounded-xl bg-red-50 border border-red-200 space-y-1.5">
+                        <p className="text-xs font-bold text-accent-red flex items-center gap-1.5">
+                          <AlertTriangle className="w-4 h-4" aria-hidden="true" />
+                          Get help right away if you have
+                        </p>
+                        <div className="flex flex-wrap gap-1">
+                          {['Trouble breathing', 'Extreme drowsiness', 'Confusion'].map((s) => (
+                            <span key={s} className="bg-white px-2 py-0.5 rounded border border-red-200 text-accent-red text-[11px] font-medium">
+                              {s}
                             </span>
-                          </div>
-                        ))
-                      ) : (
-                        [
-                          { name: 'Spicy Pani Puri & Fried Pakora', category: 'Street Food', reason: 'Triggers severe gastric acid & disrupts Pantoprazole' },
-                          { name: 'Unpasteurized Milk & Raw Cream', category: 'Dairy', reason: 'High bacterial risk during active loose motion recovery' }
-                        ].map((dish, i) => (
-                          <div key={i} className="p-2 rounded-xl bg-red-50/50 border border-red-100 flex items-center justify-between text-[10px]">
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* DIET */}
+                  {screen === 'diet' && (
+                    <>
+                      <div className="flex justify-between items-center">
+                        <p className="text-base font-bold text-primary-text">Diet plan</p>
+                        <span className="text-[11px] font-semibold text-secondary-text bg-bg-warm border border-border-light px-2 py-0.5 rounded-full">Acidity · Loose motions</span>
+                      </div>
+                      <p className="text-xs text-secondary-text">Based on your 2 medicines and current symptoms.</p>
+
+                      <div className="bg-bg-warm p-1 rounded-xl border border-border-light flex text-xs font-bold text-secondary-text" role="group" aria-label="Diet list">
+                        <button
+                          onClick={() => setDietTab('eat')}
+                          aria-pressed={dietTab === 'eat'}
+                          className={`flex-1 py-1.5 rounded-lg transition-colors ${dietTab === 'eat' ? 'bg-accent-emerald text-white' : 'hover:text-primary-text'}`}
+                        >
+                          Eat ({EAT.length})
+                        </button>
+                        <button
+                          onClick={() => setDietTab('limit')}
+                          aria-pressed={dietTab === 'limit'}
+                          className={`flex-1 py-1.5 rounded-lg transition-colors ${dietTab === 'limit' ? 'bg-accent-red text-white' : 'hover:text-primary-text'}`}
+                        >
+                          Limit ({LIMIT.length})
+                        </button>
+                      </div>
+
+                      <ul className="space-y-1.5">
+                        {(dietTab === 'eat' ? EAT : LIMIT).map((f) => (
+                          <li
+                            key={f.name}
+                            className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 ${dietTab === 'eat' ? 'bg-white border-border-light' : 'bg-red-50/50 border-red-100'}`}
+                          >
                             <div>
-                              <p className="font-bold text-primary-text">{dish.name}</p>
-                              <p className="text-[8px] text-accent-red font-medium">{dish.reason}</p>
+                              <p className="text-xs font-bold text-primary-text">{f.name}</p>
+                              <p className={`text-[11px] ${dietTab === 'eat' ? 'text-secondary-text' : 'text-accent-red'}`}>{f.note}</p>
                             </div>
-                            <span className="text-[8px] font-bold text-accent-red bg-red-100 px-2 py-0.5 rounded-full flex-shrink-0">
-                              ❌ Restricted
-                            </span>
-                          </div>
-                        ))
-                      )}
-                    </div>
-
-                  </motion.div>
-                )}
-
-                {/* Bottom Navigation Bar */}
-                <div className="h-12 bg-white border-t border-border-light flex items-center justify-around text-secondary-text z-30">
-                  <button 
-                    onClick={() => setActiveScreen('home')}
-                    className={`flex flex-col items-center text-[9px] font-medium transition-colors ${activeScreen === 'home' ? 'text-accent-emerald font-bold' : 'hover:text-primary-text'}`}
-                  >
-                    <Home className="w-4 h-4" />
-                    <span>Home</span>
-                  </button>
-                  <button 
-                    onClick={() => setActiveScreen('timeline')}
-                    className={`flex flex-col items-center text-[9px] font-medium transition-colors ${activeScreen === 'timeline' ? 'text-accent-emerald font-bold' : 'hover:text-primary-text'}`}
-                  >
-                    <Activity className="w-4 h-4" />
-                    <span>Timeline</span>
-                  </button>
-                  <button 
-                    onClick={() => showToast('Quick Add Menu')}
-                    className="w-8 h-8 rounded-full bg-primary-text hover:bg-accent-emerald text-white flex items-center justify-center -mt-4 shadow-sm transition-colors"
-                  >
-                    <Plus className="w-5 h-5" />
-                  </button>
-                  <button 
-                    onClick={() => setActiveScreen('interaction')}
-                    className={`flex flex-col items-center text-[9px] font-medium transition-colors ${activeScreen === 'interaction' ? 'text-accent-emerald font-bold' : 'hover:text-primary-text'}`}
-                  >
-                    <ShieldAlert className="w-4 h-4" />
-                    <span>Radar</span>
-                  </button>
-                  <button 
-                    onClick={() => setActiveScreen('diet')}
-                    className={`flex flex-col items-center text-[9px] font-medium transition-colors ${activeScreen === 'diet' ? 'text-accent-emerald font-bold' : 'hover:text-primary-text'}`}
-                  >
-                    <Apple className="w-4 h-4" />
-                    <span>Diet</span>
-                  </button>
+                            {dietTab === 'eat' ? (
+                              <Check className="w-4 h-4 text-accent-emerald flex-shrink-0" aria-label="Recommended" />
+                            ) : (
+                              <X className="w-4 h-4 text-accent-red flex-shrink-0" aria-label="Limit" />
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
                 </div>
 
-              </div>
-            </div>
-
-          </div>
-
-          {/* Right Column: Interactive Quick Control Sandbox */}
-          <div className="lg:col-span-3 space-y-4 text-left">
-            <div className="bg-white border border-border-light rounded-2xl p-5 space-y-4 shadow-xs">
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary-text">
-                <Sparkles className="w-4 h-4 text-accent-emerald" />
-                <span>Simulate App Actions</span>
-              </div>
-              <p className="text-xs text-secondary-text">
-                Test how Medhee responds dynamically to user interactions in real-time.
-              </p>
-
-              <div className="space-y-2">
-                <button
-                  onClick={() => {
-                    setActiveScreen('home');
-                    toggleMed('med1');
-                  }}
-                  className="w-full text-left p-3 rounded-xl bg-bg-warm hover:bg-accent-soft/40 border border-border-light text-xs font-semibold text-primary-text flex items-center justify-between group transition-all"
-                >
-                  <span>1. Mark Dose Taken</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-accent-emerald group-hover:translate-x-1 transition-transform" />
-                </button>
-
-                <button
-                  onClick={() => {
-                    setActiveScreen('timeline');
-                    setExpandedTimelineId('1');
-                  }}
-                  className="w-full text-left p-3 rounded-xl bg-bg-warm hover:bg-accent-soft/40 border border-border-light text-xs font-semibold text-primary-text flex items-center justify-between group transition-all"
-                >
-                  <span>2. Expand Loose Motion Event</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-accent-emerald group-hover:translate-x-1 transition-transform" />
-                </button>
-
-                <button
-                  onClick={() => {
-                    setActiveScreen('interaction');
-                    setSelectedTimelineHour(12);
-                  }}
-                  className="w-full text-left p-3 rounded-xl bg-bg-warm hover:bg-accent-soft/40 border border-border-light text-xs font-semibold text-primary-text flex items-center justify-between group transition-all"
-                >
-                  <span>3. Check Livobid Interaction</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-accent-emerald group-hover:translate-x-1 transition-transform" />
-                </button>
-
-                <button
-                  onClick={() => {
-                    setActiveScreen('diet');
-                    setDietTab('avoid');
-                  }}
-                  className="w-full text-left p-3 rounded-xl bg-bg-warm hover:bg-accent-soft/40 border border-border-light text-xs font-semibold text-primary-text flex items-center justify-between group transition-all"
-                >
-                  <span>4. Filter High Risk Foods</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-accent-emerald group-hover:translate-x-1 transition-transform" />
-                </button>
-              </div>
-
-              <div className="pt-2 border-t border-border-light text-[11px] text-secondary-text">
-                <p className="italic">💡 Tip: You can also tap directly on the mobile phone screen components on the left.</p>
+                {/* Bottom navigation */}
+                <nav className="h-14 bg-white border-t border-border-light flex items-center justify-around text-secondary-text" aria-label="App navigation">
+                  {[
+                    { key: 'home' as const, icon: Home, label: 'Home' },
+                    { key: 'history' as const, icon: Activity, label: 'History' },
+                    { key: 'interaction' as const, icon: ShieldAlert, label: 'Check' },
+                    { key: 'diet' as const, icon: Apple, label: 'Diet' },
+                  ].map(({ key, icon: Icon, label }) => (
+                    <button
+                      key={key}
+                      onClick={() => setScreen(key)}
+                      aria-current={screen === key ? 'page' : undefined}
+                      className={`flex flex-col items-center text-[11px] transition-colors ${screen === key ? 'text-accent-emerald font-bold' : 'hover:text-primary-text'}`}
+                    >
+                      <Icon className="w-5 h-5" aria-hidden="true" />
+                      {label}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+                    className="flex flex-col items-center text-[11px] hover:text-primary-text"
+                    aria-label="Add medicine"
+                  >
+                    <Plus className="w-5 h-5" aria-hidden="true" />
+                    Add
+                  </button>
+                </nav>
               </div>
             </div>
           </div>
-
         </div>
-
       </div>
     </section>
   );
