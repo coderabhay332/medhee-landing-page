@@ -5,19 +5,21 @@ import Link from 'next/link';
 import { Search, X } from 'lucide-react';
 import type { DrugListItem } from '@/lib/drugs';
 
+export type DrugIndexItem = Pick<DrugListItem, 'slug' | 'title' | 'drugName' | 'brandName' | 'genericName'>;
+
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
-function letterOf(item: DrugListItem): string {
+function letterOf(item: DrugIndexItem): string {
   const ch = (item.drugName || item.title || '').trim().charAt(0).toUpperCase();
   return ch >= 'A' && ch <= 'Z' ? ch : '#';
 }
 
-export default function DrugBrowser({ drugs }: { drugs: DrugListItem[] }) {
+export default function DrugBrowser({ drugs }: { drugs: DrugIndexItem[] }) {
   const [query, setQuery] = useState('');
 
   // Group alphabetically once.
   const groups = useMemo(() => {
-    const map: Record<string, DrugListItem[]> = {};
+    const map: Record<string, DrugIndexItem[]> = {};
     for (const drug of drugs) {
       (map[letterOf(drug)] ??= []).push(drug);
     }
@@ -82,7 +84,7 @@ export default function DrugBrowser({ drugs }: { drugs: DrugListItem[] }) {
             <ul className="mt-4 grid gap-x-8 gap-y-2 sm:grid-cols-2">
               {searchResults.map((d) => (
                 <li key={d.slug} className="border-b border-border-light/60 py-2">
-                  <Link href={`/drugs/${d.slug}`} className="group flex items-baseline justify-between gap-3">
+                  <Link href={`/drugs/${d.slug}`} prefetch={false} className="group flex items-baseline justify-between gap-3">
                     <span className="font-medium text-primary-text group-hover:text-accent-emerald">
                       {d.drugName || d.title}
                     </span>
@@ -147,6 +149,7 @@ export default function DrugBrowser({ drugs }: { drugs: DrugListItem[] }) {
                       <span className="mx-2 flex-1 border-b border-dotted border-border-light" />
                       <Link
                         href={`/drugs/${d.slug}`}
+                        prefetch={false}
                         className="shrink-0 text-sm font-medium text-accent-emerald hover:underline"
                       >
                         (info)

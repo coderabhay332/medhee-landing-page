@@ -59,6 +59,7 @@ export default function DrugSearchGrid({ drugs }: { drugs: DrugListItem[] }) {
             <Link
               key={drug.slug}
               href={`/drugs/${drug.slug}`}
+              prefetch={false}
               className="group flex min-h-48 flex-col rounded-3xl border border-border-light bg-white p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-accent-emerald/40 hover:shadow-xl hover:shadow-emerald-950/5"
             >
               <div className="flex items-start justify-between gap-4">

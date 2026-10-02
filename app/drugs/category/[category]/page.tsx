@@ -114,6 +114,7 @@ export default async function CategoryPage({
                 <Link
                   key={c.slug}
                   href={`/drugs/category/${c.slug}`}
+                  prefetch={false}
                   className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                     c.slug === category
                       ? 'border-accent-emerald bg-accent-emerald text-white'

@@ -362,6 +362,7 @@ export default async function DrugDetailPage({
                   <Link
                     key={item.slug}
                     href={`/drugs/${item.slug}`}
+                    prefetch={false}
                     className="group flex flex-col rounded-2xl border border-border-light bg-white p-5 transition duration-300 hover:-translate-y-0.5 hover:border-accent-emerald/40 hover:shadow-lg"
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -379,6 +380,7 @@ export default async function DrugDetailPage({
                 {article.primaryCategory && (
                   <Link
                     href={`/drugs/category/${categoryToSlug(article.primaryCategory)}`}
+                    prefetch={false}
                     className="inline-flex items-center gap-2 text-sm font-semibold text-primary-text transition-colors hover:text-accent-emerald"
                   >
                     All {article.primaryCategory} medicines <ArrowRight className="h-4 w-4" />

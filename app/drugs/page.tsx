@@ -96,6 +96,7 @@ export default async function DrugsPage() {
                     <Link
                       key={d.slug}
                       href={`/drugs/${d.slug}`}
+                      prefetch={false}
                       className="group relative flex min-h-40 flex-col justify-between overflow-hidden rounded-3xl border border-border-light bg-white p-5 transition duration-300 hover:-translate-y-1 hover:border-accent-emerald/40 hover:shadow-xl hover:shadow-emerald-950/5"
                     >
                       <div className="flex items-start justify-between">
@@ -124,6 +125,7 @@ export default async function DrugsPage() {
                   <Link
                     key={c.slug}
                     href={`/drugs/category/${c.slug}`}
+                    prefetch={false}
                     className="rounded-full border border-border-light bg-white px-3 py-1.5 text-xs font-medium text-secondary-text transition-colors hover:border-accent-emerald/40 hover:text-primary-text"
                   >
                     {c.name} <span className="text-accent-emerald">({c.count})</span>
@@ -138,7 +140,9 @@ export default async function DrugsPage() {
         <section className="border-t border-border-light/70">
           <div className="mx-auto max-w-6xl px-5 py-12 md:px-8 md:py-16">
             <h2 className="font-display text-3xl font-bold">Browse drugs and medications</h2>
-            <DrugBrowser drugs={drugs} />
+            <DrugBrowser
+              drugs={drugs.map(({ slug, title, drugName, brandName, genericName }) => ({ slug, title, drugName, brandName, genericName }))}
+            />
           </div>
         </section>
       </main>
