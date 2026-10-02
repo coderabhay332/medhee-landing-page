@@ -17,7 +17,7 @@
   /* Font families are supplied by next/font in app/layout.tsx, which
      self-hosts the files (no render-blocking request, no layout shift). */
   --font-sans: var(--font-inter), system-ui, sans-serif;
-  --font-display: var(--font-space-grotesk), sans-serif;
+  --font-display: var(--font-anek), sans-serif;
   --font-mono: var(--font-jetbrains-mono), monospace;
 }
 

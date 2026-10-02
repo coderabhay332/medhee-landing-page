@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Pill, ShieldAlert, FileText, Activity, Apple, Thermometer, ArrowRight, Stethoscope, Home, Info } from 'lucide-react';
+import { Pill, ShieldAlert, FileText, Activity, Apple, Thermometer, Stethoscope, Home, Info } from 'lucide-react';
 import { HealthCard } from '../types';
 
 const CARDS: HealthCard[] = [
@@ -90,34 +90,22 @@ export default function SectionHero() {
           <p className="text-sm font-medium text-accent-emerald">Now in beta · English and हिन्दी</p>
 
           <div className="space-y-4 max-w-2xl">
-            <motion.h1
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="font-display text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-primary-text leading-[1.08]"
-            >
-              Healthcare that <br />
-              <span className="text-accent-emerald">remembers you.</span>
-            </motion.h1>
+            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-primary-text leading-[1.08]">
+              Healthcare that remembers you.
+            </h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-lg md:text-xl text-secondary-text leading-relaxed"
-            >
+            <p className="text-lg md:text-xl text-secondary-text leading-relaxed">
               Medhee keeps your medicines, allergies, conditions and lab reports in one place. When you feel unwell, the AI nurse
               or your doctor already has your history, so you don't have to explain it all again.
-            </motion.p>
+            </p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
             <button
               onClick={() => document.getElementById('final-cta')?.scrollIntoView({ behavior: 'smooth' })}
-              className="px-6 py-3.5 rounded-full bg-primary-text hover:bg-accent-emerald text-white text-sm font-medium transition-colors flex items-center justify-center gap-2 group"
+              className="px-6 py-3.5 rounded-full bg-primary-text hover:bg-accent-emerald text-white text-sm font-medium transition-colors"
             >
               Join the waitlist
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
             </button>
             <button
               onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}

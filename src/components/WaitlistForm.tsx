@@ -5,7 +5,7 @@
  */
 
 import { useState } from 'react';
-import { ArrowUpRight, CheckCircle2, Loader2 } from 'lucide-react';
+import { CheckCircle2, Loader2 } from 'lucide-react';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
@@ -92,7 +92,7 @@ export default function WaitlistForm() {
       <button
         type="submit"
         disabled={status === 'loading'}
-        className="group px-8 py-3.5 rounded-full bg-primary-text hover:bg-accent-emerald disabled:opacity-60 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2"
+        className="px-8 py-3.5 rounded-full bg-primary-text hover:bg-accent-emerald disabled:opacity-60 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2"
       >
         {status === 'loading' ? (
           <>
@@ -100,7 +100,7 @@ export default function WaitlistForm() {
           </>
         ) : (
           <>
-            Join the waitlist <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" aria-hidden="true" />
+            Join the waitlist
           </>
         )}
       </button>

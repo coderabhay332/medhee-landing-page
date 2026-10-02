@@ -9,7 +9,7 @@ const QUESTIONS = [
   'Are you allergic to any medicine?',
   'When did this start?',
   'Do you have your old reports with you?',
-  'Any long-term conditions — diabetes, BP, thyroid?',
+  'Any long-term conditions, like diabetes, BP or thyroid?',
 ];
 
 export default function SectionZero() {
@@ -43,9 +43,9 @@ export default function SectionZero() {
       <div className="w-full max-w-5xl mx-auto px-6 md:px-12 space-y-12">
         <div className="text-center space-y-2">
           <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight text-primary-text">
-            Every visit starts with the same questions.
+            Every visit starts with the same questions
           </h2>
-          <p className="text-base text-secondary-text">New clinic, new doctor, new app — you answer them all over again.</p>
+          <p className="text-base text-secondary-text">New clinic, new doctor, new app. You answer them all over again.</p>
         </div>
 
         <div className="relative w-full max-w-2xl mx-auto min-h-[380px] flex items-center">
@@ -71,11 +71,11 @@ export default function SectionZero() {
             aria-hidden={!answered}
           >
             <h3 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-primary-text leading-tight">
-              With Medhee, they're <span className="text-accent-emerald">already answered.</span>
+              With Medhee, they're already answered
             </h3>
             <p className="text-base text-secondary-text leading-relaxed max-w-xl">
-              Your medicines, allergies, conditions and reports stay in one place. When you consult a doctor in the app, they see it
-              before the call starts — and the AI nurse uses it to give advice that fits you.
+              Your medicines, allergies, conditions and reports are saved in your profile. When you consult a doctor in the app, they see it
+              before the call starts. The AI nurse uses it too, so its advice fits you.
             </p>
           </motion.div>
         </div>

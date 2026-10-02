@@ -25,11 +25,11 @@ export default function SectionDashboard() {
   return (
     <section id="doctor-dashboard" className="relative py-16 md:py-20 px-6 md:px-12 bg-bg-warm border-b border-border-light">
       <div className="w-full max-w-7xl mx-auto space-y-10">
-        <div className="space-y-3 max-w-2xl text-left">
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-primary-text">What the doctor sees.</h2>
-          <p className="text-base text-secondary-text leading-relaxed">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-12 items-end text-left">
+          <h2 className="lg:col-span-5 font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-primary-text">What the doctor sees</h2>
+          <p className="lg:col-span-7 text-base text-secondary-text leading-relaxed">
             Doctors join from the Medhee doctor app. When a consult starts, the patient's history, medicines, allergies and the
-            AI nurse's notes are on one screen — so the call is spent on the problem, not on paperwork.
+            AI nurse's notes are on one screen, so the doctor can start with the problem instead of the usual questions.
           </p>
         </div>
 
@@ -111,7 +111,7 @@ export default function SectionDashboard() {
                 <ul className="space-y-1.5 text-sm text-secondary-text">
                   <li className="flex gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-accent-amber mt-2 flex-shrink-0" aria-hidden="true" />
-                    Type 2 diabetes — higher risk of dehydration.
+                    Type 2 diabetes: higher risk of dehydration.
                   </li>
                   <li className="flex gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-accent-amber mt-2 flex-shrink-0" aria-hidden="true" />

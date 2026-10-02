@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import { FileText, UploadCloud, Sparkles, Send, RotateCcw } from 'lucide-react';
+import { FileText, UploadCloud, Send, RotateCcw } from 'lucide-react';
 import { COPY, type Lang, type LabStatus } from './featureCopy';
 
 type Stage = 'upload' | 'processing' | 'ready';
@@ -160,7 +160,7 @@ export default function ReportChatDemo({ lang }: { lang: Lang }) {
               return (
                 <div key={i} className="flex justify-start gap-1.5">
                   <span className="w-6 h-6 rounded-full bg-accent-emerald text-white flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="w-3 h-3" aria-hidden="true" />
+                    <FileText className="w-3 h-3" aria-hidden="true" />
                   </span>
                   <p className="max-w-[80%] text-[11px] leading-snug whitespace-pre-line px-3 py-2 rounded-2xl rounded-bl-sm bg-white border border-border-light text-primary-text">
                     {text}

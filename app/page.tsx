@@ -18,12 +18,12 @@ export default function HomePage() {
       <main className="relative">
         <SectionHero />
         <SectionZero />
-        <SectionAppShowcase />
-        <SectionFeatureSuite />
         <SectionRahul />
+        <SectionDashboard />
+        <SectionFeatureSuite />
+        <SectionAppShowcase />
         <SectionBeforeProblems />
         <SectionAILimits />
-        <SectionDashboard />
         <SectionTrust />
         <SectionVision />
         <SectionFooter />

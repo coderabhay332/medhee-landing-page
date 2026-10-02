@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 import { MEDHEE_LOGO_PNG_DATA_URI } from '@/lib/brand-image';
 
 export const runtime = 'nodejs';
-export const alt = 'Medhee — Healthcare that remembers you';
+export const alt = 'Medhee | Healthcare that remembers you';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 

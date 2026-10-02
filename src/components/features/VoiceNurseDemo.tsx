@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
-import { Mic, PhoneOff, Sparkles, AlertTriangle, CheckCircle2, RotateCcw, Stethoscope, Phone } from 'lucide-react';
+import { Mic, PhoneOff, AlertTriangle, CheckCircle2, RotateCcw, Stethoscope, Phone } from 'lucide-react';
 import { COPY, type Lang, type Scenario } from './featureCopy';
 
 type Stage = 'idle' | 'connecting' | 'talking' | 'result';
@@ -75,11 +75,11 @@ export default function VoiceNurseDemo({ lang, onNavigate }: { lang: Lang; onNav
   const nurseSpeaking = stage === 'talking' && lastLine?.from === 'nurse';
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 text-left bg-gradient-to-b from-white via-white to-accent-soft/50">
+    <div className="flex-1 flex flex-col min-h-0 text-left bg-white">
       {/* Header */}
       <div className="px-4 pt-2 pb-3 flex items-center gap-2 border-b border-border-light">
         <span className="w-8 h-8 rounded-full bg-accent-emerald text-white flex items-center justify-center">
-          <Sparkles className="w-4 h-4" aria-hidden="true" />
+          <Stethoscope className="w-4 h-4" aria-hidden="true" />
         </span>
         <div className="flex-1">
           <p className="text-xs font-bold text-primary-text">{t.title}</p>
@@ -106,7 +106,7 @@ export default function VoiceNurseDemo({ lang, onNavigate }: { lang: Lang; onNav
           </button>
 
           <fieldset className="w-full space-y-2">
-            <legend className="text-[10px] font-semibold text-secondary-text uppercase tracking-wider mb-2 mx-auto">{t.scenarioLabel}</legend>
+            <legend className="text-[11px] font-semibold text-secondary-text mb-2 mx-auto">{t.scenarioLabel}</legend>
             <div className="flex flex-col gap-2">
               {(Object.keys(t.scenarios) as Scenario[]).map((s) => (
                 <label
@@ -179,7 +179,7 @@ export default function VoiceNurseDemo({ lang, onNavigate }: { lang: Lang; onNav
                   className={`flex ${line.from === 'you' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div className="max-w-[82%]">
-                    <p className={`text-[10px] font-bold uppercase tracking-wider mb-0.5 ${line.from === 'you' ? 'text-right text-secondary-text' : 'text-accent-emerald'}`}>
+                    <p className={`text-[10px] font-bold mb-0.5 ${line.from === 'you' ? 'text-right text-secondary-text' : 'text-accent-emerald'}`}>
                       {line.from === 'you' ? t.youLabel : t.nurseLabel}
                     </p>
                     <p

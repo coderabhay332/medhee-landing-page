@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
+import { Inter, Anek_Devanagari, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 
 // Self-hosted at build time: no render-blocking request to fonts.googleapis.com
@@ -11,10 +11,10 @@ const inter = Inter({
   display: 'swap',
 });
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-space-grotesk',
+// Ek Type's Anek covers Latin and Devanagari, so Hindi headings match the English ones.
+const anek = Anek_Devanagari({
+  subsets: ['latin', 'devanagari'],
+  variable: '--font-anek',
   display: 'swap',
 });
 
@@ -30,7 +30,7 @@ const SITE_URL = 'https://medhee.com';
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Medhee — Your medicines, reports and doctor in one app',
+    default: 'Medhee | Your medicines, reports and doctor in one app',
     template: '%s | Medhee',
   },
   description:
@@ -57,14 +57,14 @@ export const metadata: Metadata = {
     url: SITE_URL,
     siteName: 'Medhee',
     locale: 'en_IN',
-    title: 'Medhee — Healthcare that remembers you',
+    title: 'Medhee | Healthcare that remembers you',
     description:
       'Your medicines, allergies and reports in one place. Medicine safety checks, an AI nurse, and doctor consults that start with your full history.',
     // OG image is generated dynamically by app/opengraph-image.tsx
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Medhee — Healthcare that remembers you',
+    title: 'Medhee | Healthcare that remembers you',
     description:
       'Your medicines, allergies and reports in one place. Medicine safety checks, an AI nurse, and doctor consults that start with your full history.',
   },
@@ -110,7 +110,7 @@ const orgSchema = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className={`${inter.variable} ${anek.variable} ${jetbrainsMono.variable}`}>
       <head>
         <script
           type="application/ld+json"

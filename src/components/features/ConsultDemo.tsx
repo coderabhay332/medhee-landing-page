@@ -291,7 +291,7 @@ export default function ConsultDemo({ lang }: { lang: Lang }) {
 
       {/* ───────── Waiting room ───────── */}
       {phase === 'waiting' && (
-        <div className="flex-1 flex flex-col items-center justify-center gap-5 p-6 text-center bg-gradient-to-b from-white to-accent-soft/60" aria-live="polite">
+        <div className="flex-1 flex flex-col items-center justify-center gap-5 p-6 text-center bg-white" aria-live="polite">
           <div className="relative w-24 h-24 flex items-center justify-center">
             <motion.span className="absolute inset-0 rounded-full bg-accent-emerald/30" {...pulse} aria-hidden="true" />
             <span className={`relative w-20 h-20 rounded-full flex items-center justify-center text-lg font-bold ${doctor.tone}`} aria-hidden="true">
@@ -327,7 +327,7 @@ export default function ConsultDemo({ lang }: { lang: Lang }) {
 
       {/* ───────── Video / voice call ───────── */}
       {phase === 'call' && mode !== 'chat' && (
-        <div className="flex-1 relative flex flex-col bg-gradient-to-b from-slate-800 via-slate-900 to-slate-950 text-white">
+        <div className="flex-1 relative flex flex-col bg-slate-900 text-white">
           <div className="flex items-center justify-between px-4 pt-2">
             <div>
               <p className="text-xs font-bold">{doctorName}</p>

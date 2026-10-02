@@ -8,12 +8,12 @@ import DrugBrowser from './DrugBrowser';
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: 'Drug Information Library — Uses, Dosage & Safety',
+  title: 'Drug Information Library: Uses, Dosage & Safety',
   description:
     'Browse plain-language medication guides A–Z covering uses, dosage, side effects, precautions, and drug interactions for over 1,300 medicines.',
   alternates: { canonical: '/drugs' },
   openGraph: {
-    title: 'Drug Information Library — Medhee',
+    title: 'Drug Information Library | Medhee',
     description:
       'Plain-language medication guides: uses, dosage, side effects, precautions, and interactions.',
     url: 'https://medhee.com/drugs',

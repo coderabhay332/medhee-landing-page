@@ -9,7 +9,7 @@ import { ArrowLeft, FileText, Mail } from 'lucide-react';
 
 export default function PageTerms() {
   useEffect(() => {
-    document.title = 'Terms of Service — Medhee';
+    document.title = 'Terms of Service | Medhee';
   }, []);
   return (
     <div className="min-h-screen bg-white font-sans">
@@ -68,11 +68,11 @@ export default function PageTerms() {
           },
           {
             title: '4. Telemedicine & Doctor Consultations',
-            body: 'Video consultations facilitated through Medhee connect you with independent licensed medical practitioners. Medhee is a technology platform only — it is not a party to the doctor-patient relationship. Consultation quality, clinical outcomes, and prescriptions are the sole responsibility of the consulting practitioner.',
+            body: 'Video consultations facilitated through Medhee connect you with independent licensed medical practitioners. Medhee is a technology platform only. It is not a party to the doctor-patient relationship. Consultation quality, clinical outcomes, and prescriptions are the sole responsibility of the consulting practitioner.',
           },
           {
             title: '5. AI Triage Disclaimer',
-            body: 'The AI symptom triage feature is informational only. It uses pattern recognition to suggest possible conditions or urgency levels. It does not replace clinical examination. For any emergency — chest pain, difficulty breathing, loss of consciousness — call 112 (India) or your local emergency number immediately.',
+            body: 'The AI symptom triage feature is informational only. It uses pattern recognition to suggest possible conditions or urgency levels. It does not replace clinical examination. For any emergency, such as chest pain, difficulty breathing or loss of consciousness, call 112 (India) or your local emergency number immediately.',
           },
           {
             title: '6. Intellectual Property',

@@ -38,7 +38,7 @@ const STEPS: Step[] = [
     id: 3,
     title: 'He describes the problem in his own words.',
     description: 'No long forms. He types (or says): “I’ve been vomiting for four hours and feel very weak.”',
-    takeaway: 'Plain language — English or Hindi, typed or spoken.',
+    takeaway: 'English or Hindi, typed or spoken.',
     scene: 'symptom',
     screenTitle: 'AI nurse',
   },
@@ -46,7 +46,7 @@ const STEPS: Step[] = [
     id: 4,
     title: 'Medhee checks it against his history.',
     description:
-      'Vomiting is more serious for someone with diabetes because it can cause dehydration, and Metformin can upset the stomach. So Medhee does not suggest home remedies — it recommends a doctor.',
+      'Vomiting is more serious for someone with diabetes because it can cause dehydration, and Metformin can upset the stomach. So Medhee does not suggest home remedies. It recommends a doctor.',
     takeaway: 'Advice changes based on your history.',
     scene: 'check',
     screenTitle: 'Assessment',
@@ -181,7 +181,7 @@ function SceneView({ scene }: { scene: Scene }) {
               <p className="text-[11px] text-secondary-text">Small sips through the day</p>
             </li>
             <li>
-              <p className="text-xs font-bold text-accent-amber">Metformin — paused</p>
+              <p className="text-xs font-bold text-accent-amber">Metformin: paused</p>
               <p className="text-[11px] text-secondary-text">Restart once you can eat normally</p>
             </li>
           </ul>
@@ -202,7 +202,7 @@ export default function SectionRahul() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-border-light pb-8">
           <div className="space-y-3">
             <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-primary-text">
-              One bad night, start to finish.
+              One bad night, start to finish
             </h2>
             <p className="text-base text-secondary-text max-w-lg">A walk-through of what using Medhee looks like when you actually get sick.</p>
           </div>

@@ -25,9 +25,8 @@ export function fmt(template: string, vars: Record<string, string | number>): st
 const en = {
   suite: {
     eyebrow: 'App features',
-    title: 'More than reminders.',
-    titleAccent: 'Help for the days you feel unwell.',
-    subtitle: 'Five things the Medhee app does today. Each demo below works — and you can switch it to Hindi.',
+    title: 'Help for the days you feel unwell',
+    subtitle: 'Five things the Medhee app does today. You can try each one below, in English or Hindi.',
     langLabel: 'Language',
     tryHint: 'Interactive demo',
     available: 'Available in the app',
@@ -37,24 +36,24 @@ const en = {
   tabs: {
     consult: { label: 'Talk to a Doctor', short: 'Video · Voice · Chat' },
     nurse: { label: 'AI Nurse', short: 'Speak your symptoms' },
-    scan: { label: 'Scan Prescription', short: 'Photo → medicine list' },
+    scan: { label: 'Scan Prescription', short: 'From a photo' },
     report: { label: 'Lab Report Chat', short: 'Ask your report' },
-    family: { label: 'Family Profiles', short: 'One app, whole family' },
+    family: { label: 'Family Profiles', short: 'Parents, kids, anyone' },
   },
   info: {
     consult: {
-      title: 'Real doctors, one tap away',
-      body: 'Pick an available doctor and consult by video, voice or chat — right inside the app. Your medicines, allergies and reports reach the doctor before the call starts, so you never repeat your history.',
+      title: 'Consult a doctor in the app',
+      body: "Pick a doctor who is available and talk by video, voice or chat inside the app. Your medicines, allergies and reports reach the doctor before the call starts, so you don't have to explain your history again.",
       points: [
-        'Video, voice or chat — your choice',
+        'Video, voice or chat, whichever you prefer',
         'The doctor sees your full health context before the call begins',
         'Doctors join from the Medhee doctor app with a live patient queue',
       ],
       try: 'Tap an available doctor, then pick video, voice or chat.',
     },
     nurse: {
-      title: 'Just say what you feel',
-      body: "Talk to Medhee's AI nurse the way you would to a real one. It listens, asks follow-up questions, checks your history and tells you how urgent it is — in English or Hindi. Prefer typing? The same assessment works as a chat.",
+      title: "Tell the AI nurse what's wrong",
+      body: "Talk to Medhee's AI nurse like you would talk to a nurse at a clinic. It asks follow-up questions, checks your history and tells you how urgent it is, in English or Hindi. If you'd rather type, the same check works as a chat.",
       points: [
         'Real-time voice conversation',
         'Follow-up questions and a severity assessment',
@@ -63,8 +62,8 @@ const en = {
       try: 'Pick a symptom and tap “Connect to AI Nurse”.',
     },
     scan: {
-      title: 'Snap a prescription, skip the typing',
-      body: 'Take a photo of a prescription and Medhee reads it for you — recognising the medicines, matching them to its medicine database and adding them to your schedule in seconds.',
+      title: 'Add medicines from a prescription photo',
+      body: 'Take a photo of a prescription. Medhee reads the medicine names, matches them to its medicine database and adds them to your schedule.',
       points: [
         'Scan with your camera or pick a photo from the gallery',
         'Medicines matched automatically, with manual search as a backup',
@@ -73,8 +72,8 @@ const en = {
       try: 'Tap “Scan with camera” to read the sample prescription.',
     },
     report: {
-      title: 'Finally understand your lab reports',
-      body: "Upload a PDF or photo of any lab report. Medhee extracts every value, flags what's out of range, and lets you ask questions in plain language — like having a doctor explain it to you.",
+      title: 'Ask questions about your lab report',
+      body: 'Upload a PDF or photo of a lab report. Medhee pulls out each value, marks the ones outside the normal range, and answers your questions in plain language.',
       points: [
         'Values extracted and flagged automatically',
         'Ask anything: “Are my values normal?”, “What should I eat?”',
@@ -83,8 +82,8 @@ const en = {
       try: 'Upload the sample report, then tap a question.',
     },
     family: {
-      title: 'Care for the whole family from one phone',
-      body: "Add your parents, kids or anyone you look after. Switch profiles to manage each person's medicines, doses and reports — made for caring for elderly parents.",
+      title: "Look after your family's medicines too",
+      body: "Add your parents, children or anyone you look after. Switch profiles to manage each person's medicines, doses and reports. Useful if you already handle your parents' medicines.",
       points: [
         'A separate health profile for every family member',
         'Track medicines and doses for each person',
@@ -186,7 +185,7 @@ const en = {
     saved: 'Saved to your assessments',
     restart: 'Start over',
     end: 'End session',
-    disclaimer: 'AI guidance only — not a diagnosis.',
+    disclaimer: 'AI guidance only. Not a diagnosis.',
   },
   scan: {
     title: 'Scan prescription',
@@ -242,7 +241,7 @@ const en = {
     placeholder: 'Ask about your report…',
     send: 'Send question',
     typing: 'Medhee is reading your report…',
-    disclaimer: 'Informational only — confirm with your doctor.',
+    disclaimer: 'For information only. Check with your doctor.',
     newReport: 'Upload another',
   },
   family: {
@@ -296,9 +295,8 @@ export type Copy = typeof en;
 const hi: Copy = {
   suite: {
     eyebrow: 'ऐप फ़ीचर',
-    title: 'सिर्फ़ रिमाइंडर नहीं।',
-    titleAccent: 'तबीयत खराब होने पर भी आपके साथ।',
-    subtitle: 'Medhee ऐप आज ये पाँच काम करता है। नीचे हर डेमो चलता है — और आप इसे हिंदी में भी देख सकते हैं।',
+    title: 'तबीयत खराब होने पर भी आपके साथ',
+    subtitle: 'Medhee ऐप आज ये पाँच काम करता है। नीचे हर एक को अंग्रेज़ी या हिंदी में आज़माएँ।',
     langLabel: 'भाषा',
     tryHint: 'इंटरैक्टिव डेमो',
     available: 'ऐप में उपलब्ध',
@@ -308,24 +306,24 @@ const hi: Copy = {
   tabs: {
     consult: { label: 'डॉक्टर से बात करें', short: 'वीडियो · वॉइस · चैट' },
     nurse: { label: 'AI नर्स', short: 'अपने लक्षण बोलें' },
-    scan: { label: 'पर्चा स्कैन करें', short: 'फ़ोटो → दवाओं की सूची' },
+    scan: { label: 'पर्चा स्कैन करें', short: 'फ़ोटो से दवाओं की सूची' },
     report: { label: 'लैब रिपोर्ट चैट', short: 'अपनी रिपोर्ट से पूछें' },
-    family: { label: 'परिवार प्रोफ़ाइल', short: 'एक ऐप, पूरा परिवार' },
+    family: { label: 'परिवार प्रोफ़ाइल', short: 'माता-पिता, बच्चे, सब' },
   },
   info: {
     consult: {
-      title: 'असली डॉक्टर, बस एक टैप दूर',
-      body: 'उपलब्ध डॉक्टर चुनें और ऐप के अंदर ही वीडियो, वॉइस या चैट से सलाह लें। कॉल शुरू होने से पहले आपकी दवाइयाँ, एलर्जी और रिपोर्ट डॉक्टर तक पहुँच जाती हैं — आपको अपनी हिस्ट्री दोहरानी नहीं पड़ती।',
+      title: 'ऐप में ही डॉक्टर से सलाह लें',
+      body: 'उपलब्ध डॉक्टर चुनें और ऐप के अंदर ही वीडियो, वॉइस या चैट से सलाह लें। कॉल शुरू होने से पहले आपकी दवाइयाँ, एलर्जी और रिपोर्ट डॉक्टर तक पहुँच जाती हैं, इसलिए आपको अपनी हिस्ट्री दोहरानी नहीं पड़ती।',
       points: [
-        'वीडियो, वॉइस या चैट — आपकी पसंद',
+        'वीडियो, वॉइस या चैट, जो आपको ठीक लगे',
         'कॉल से पहले डॉक्टर आपकी पूरी हेल्थ जानकारी देखते हैं',
         'डॉक्टर Medhee डॉक्टर ऐप से लाइव मरीज़ कतार के साथ जुड़ते हैं',
       ],
       try: 'कोई उपलब्ध डॉक्टर चुनें, फिर वीडियो, वॉइस या चैट चुनें।',
     },
     nurse: {
-      title: 'बस बताइए कि आपको कैसा लग रहा है',
-      body: 'Medhee की AI नर्स से वैसे ही बात करें जैसे किसी असली नर्स से करते हैं। यह सुनती है, आगे के सवाल पूछती है, आपकी हिस्ट्री देखती है और बताती है कि स्थिति कितनी गंभीर है — अंग्रेज़ी या हिंदी में। टाइप करना पसंद है? यही जाँच चैट में भी होती है।',
+      title: 'AI नर्स को बताइए कि क्या तकलीफ़ है',
+      body: 'Medhee की AI नर्स से वैसे ही बात करें जैसे किसी असली नर्स से करते हैं। यह सुनती है, आगे के सवाल पूछती है, आपकी हिस्ट्री देखती है और बताती है कि स्थिति कितनी गंभीर है। यह अंग्रेज़ी और हिंदी दोनों में काम करती है। टाइप करना पसंद है? यही जाँच चैट में भी होती है।',
       points: [
         'रियल-टाइम वॉइस बातचीत',
         'आगे के सवाल और गंभीरता का आकलन',
@@ -334,8 +332,8 @@ const hi: Copy = {
       try: 'एक लक्षण चुनें और “AI नर्स से जुड़ें” दबाएँ।',
     },
     scan: {
-      title: 'पर्चे की फ़ोटो लें, टाइपिंग छोड़ें',
-      body: 'पर्चे की फ़ोटो लें और Medhee उसे आपके लिए पढ़ लेता है — दवाइयों को पहचानकर, उन्हें अपने दवा डेटाबेस से मिलाकर, कुछ ही सेकंड में आपके शेड्यूल में जोड़ देता है।',
+      title: 'पर्चे की फ़ोटो से दवाइयाँ जोड़ें',
+      body: 'पर्चे की फ़ोटो लें। Medhee दवाइयों के नाम पढ़ता है, उन्हें अपने दवा डेटाबेस से मिलाता है और आपके शेड्यूल में जोड़ देता है।',
       points: [
         'कैमरे से स्कैन करें या गैलरी से फ़ोटो चुनें',
         'दवाइयाँ अपने-आप मिलाई जाती हैं, ज़रूरत हो तो मैन्युअल सर्च भी',
@@ -344,8 +342,8 @@ const hi: Copy = {
       try: 'सैंपल पर्चा पढ़ने के लिए “कैमरे से स्कैन करें” दबाएँ।',
     },
     report: {
-      title: 'अब अपनी लैब रिपोर्ट आसानी से समझें',
-      body: 'किसी भी लैब रिपोर्ट की PDF या फ़ोटो अपलोड करें। Medhee हर वैल्यू निकालता है, सामान्य सीमा से बाहर वाली वैल्यू को चिह्नित करता है, और आपको आसान भाषा में सवाल पूछने देता है — जैसे कोई डॉक्टर आपको समझा रहा हो।',
+      title: 'अपनी लैब रिपोर्ट के बारे में सवाल पूछें',
+      body: 'किसी भी लैब रिपोर्ट की PDF या फ़ोटो अपलोड करें। Medhee हर वैल्यू निकालता है, सामान्य सीमा से बाहर वाली वैल्यू को चिह्नित करता है, और आपके सवालों के जवाब आसान भाषा में देता है।',
       points: [
         'वैल्यू अपने-आप निकाली और चिह्नित की जाती हैं',
         'कुछ भी पूछें: “क्या मेरी वैल्यू सामान्य हैं?”, “मुझे क्या खाना चाहिए?”',
@@ -354,8 +352,8 @@ const hi: Copy = {
       try: 'सैंपल रिपोर्ट अपलोड करें, फिर कोई सवाल चुनें।',
     },
     family: {
-      title: 'एक फ़ोन से पूरे परिवार की देखभाल',
-      body: 'अपने माता-पिता, बच्चों या जिनकी भी आप देखभाल करते हैं, उन्हें जोड़ें। हर व्यक्ति की दवाइयाँ, खुराक और रिपोर्ट संभालने के लिए प्रोफ़ाइल बदलें — बुज़ुर्ग माता-पिता की देखभाल के लिए बना।',
+      title: 'परिवार की दवाइयाँ भी संभालें',
+      body: 'अपने माता-पिता, बच्चों या जिनकी भी आप देखभाल करते हैं, उन्हें जोड़ें। हर व्यक्ति की दवाइयाँ, खुराक और रिपोर्ट संभालने के लिए प्रोफ़ाइल बदलें। अगर आप अपने माता-पिता की दवाइयाँ संभालते हैं तो यह काम आता है।',
       points: [
         'परिवार के हर सदस्य के लिए अलग हेल्थ प्रोफ़ाइल',
         'हर व्यक्ति की दवाइयों और खुराक पर नज़र',
@@ -457,7 +455,7 @@ const hi: Copy = {
     saved: 'आपके असेसमेंट में सेव किया गया',
     restart: 'फिर से शुरू करें',
     end: 'सेशन समाप्त करें',
-    disclaimer: 'सिर्फ़ AI मार्गदर्शन — यह निदान नहीं है।',
+    disclaimer: 'सिर्फ़ AI मार्गदर्शन। यह निदान नहीं है।',
   },
   scan: {
     title: 'पर्चा स्कैन करें',
@@ -513,7 +511,7 @@ const hi: Copy = {
     placeholder: 'अपनी रिपोर्ट के बारे में पूछें…',
     send: 'सवाल भेजें',
     typing: 'Medhee आपकी रिपोर्ट पढ़ रहा है…',
-    disclaimer: 'सिर्फ़ जानकारी के लिए — डॉक्टर से पुष्टि करें।',
+    disclaimer: 'सिर्फ़ जानकारी के लिए। डॉक्टर से पुष्टि करें।',
     newReport: 'दूसरी रिपोर्ट अपलोड करें',
   },
   family: {

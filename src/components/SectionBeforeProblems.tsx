@@ -19,7 +19,7 @@ const CHECKS: Check[] = [
     label: 'Medicine safety',
     title: 'Warnings before you take something risky',
     description:
-      'Every medicine you add — typed, scanned or prescribed — is checked against your other medicines and your allergies. If there is a problem, you see a clear warning and what to do about it.',
+      'Medhee checks every new medicine against your other medicines and your allergies, including ones you scan or get from a doctor in the app. If there is a problem, you see a warning and what to do about it.',
     icon: Pill,
     preview: (
       <div className="space-y-3 text-left">
@@ -45,7 +45,7 @@ const CHECKS: Check[] = [
     label: 'Lab reports',
     title: 'Reports you can actually understand',
     description:
-      'Upload a PDF or photo of a lab report. Medhee pulls out the values, marks anything outside the normal range, and keeps every report in one place instead of lost in WhatsApp chats.',
+      'Upload a PDF or photo of a lab report. Medhee pulls out the values, marks anything outside the normal range, and saves every report to your profile, so you are not scrolling through WhatsApp to find last year’s blood test.',
     icon: FileText,
     preview: (
       <div className="space-y-2 text-left">
@@ -69,9 +69,9 @@ const CHECKS: Check[] = [
   {
     id: 'history',
     label: 'Health history',
-    title: 'Your history, kept in one place',
+    title: 'Your health history',
     description:
-      'Conditions, allergies, current and past medicines, past consultations and symptom checks all live in your profile — not scattered across clinics. You can edit it any time, or delete your account and data from settings.',
+      'Your profile holds your conditions, allergies, current and past medicines, past consultations and symptom checks. You can edit it any time, or delete your account and data from settings.',
     icon: History,
     preview: (
       <ol className="space-y-3 text-left border-l border-border-light pl-4">
@@ -95,7 +95,7 @@ const CHECKS: Check[] = [
     label: 'Diet',
     title: 'Food advice that fits your medicines',
     description:
-      'Your diet plan is built from your conditions and the medicines you take — which foods help, and which ones to cut down on — with everyday Indian meals, not generic calorie charts.',
+      'Your diet plan is built from your conditions and the medicines you take. It lists foods that help and foods to cut down on, using everyday Indian meals.',
     icon: Apple,
     preview: (
       <div className="space-y-2 text-left">
@@ -132,11 +132,11 @@ export default function SectionBeforeProblems() {
   return (
     <section id="safety-checks" className="relative py-16 md:py-20 px-6 md:px-12 bg-white border-t border-border-light">
       <div className="w-full max-w-7xl mx-auto space-y-10">
-        <div className="space-y-3 max-w-2xl text-left">
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-primary-text">
-            What Medhee keeps an eye on.
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-12 items-end text-left">
+          <h2 className="lg:col-span-6 font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-primary-text">
+            What Medhee keeps an eye on
           </h2>
-          <p className="text-base text-secondary-text leading-relaxed">
+          <p className="lg:col-span-6 text-base text-secondary-text leading-relaxed">
             Quiet checks in the background, so small problems get noticed before they turn into big ones.
           </p>
         </div>

@@ -8,7 +8,7 @@
 
 import { useRef, useState, type KeyboardEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Video, Mic, ScanLine, FileText, Users, Languages, CheckCircle2, MousePointerClick } from 'lucide-react';
+import { Video, Mic, ScanLine, FileText, Users, Languages, MousePointerClick } from 'lucide-react';
 import { COPY, type FeatureKey, type Lang } from './features/featureCopy';
 import PhoneFrame from './features/PhoneFrame';
 import ConsultDemo from './features/ConsultDemo';
@@ -77,10 +77,9 @@ export default function SectionFeatureSuite() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-4 max-w-3xl text-left">
             <h2 id="features-heading" className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-primary-text leading-tight">
-              {c.suite.title} <br className="hidden sm:block" />
-              <span className="text-accent-emerald">{c.suite.titleAccent}</span>
+              {c.suite.title}
             </h2>
-            <p className="text-base sm:text-lg text-secondary-text font-light leading-relaxed">{c.suite.subtitle}</p>
+            <p className="text-base sm:text-lg text-secondary-text leading-relaxed">{c.suite.subtitle}</p>
           </div>
 
           {/* Language switch */}
@@ -165,12 +164,11 @@ export default function SectionFeatureSuite() {
               >
                 <p className="text-sm font-medium text-accent-emerald">{c.suite.available}</p>
                 <h3 className="font-display text-2xl sm:text-3xl font-bold text-primary-text leading-tight">{info.title}</h3>
-                <p className="text-sm sm:text-base text-secondary-text font-light leading-relaxed">{info.body}</p>
-                <ul className="space-y-2.5">
+                <p className="text-sm sm:text-base text-secondary-text leading-relaxed">{info.body}</p>
+                <ul className="border-t border-border-light">
                   {info.points.map((p) => (
-                    <li key={p} className="flex items-start gap-2.5 text-sm text-primary-text">
-                      <CheckCircle2 className="w-4 h-4 text-accent-emerald mt-0.5 flex-shrink-0" aria-hidden="true" />
-                      <span>{p}</span>
+                    <li key={p} className="py-2.5 border-b border-border-light text-sm text-primary-text">
+                      {p}
                     </li>
                   ))}
                 </ul>

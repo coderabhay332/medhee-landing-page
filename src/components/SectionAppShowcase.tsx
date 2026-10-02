@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
   Home,
   Pill,
-  ShieldCheck,
   ShieldAlert,
   ChevronRight,
   Apple,
@@ -49,23 +48,23 @@ const INFO: Record<ScreenKey, { title: string; body: string; try: string }> = {
   },
   diet: {
     title: 'Food that works with your medicines',
-    body: 'A diet plan built from your conditions and medicines, with everyday Indian food — what to eat more of and what to limit.',
+    body: 'A diet plan built from your conditions and medicines, using everyday Indian food. It shows what to eat more of and what to limit.',
     try: 'Switch between “Eat” and “Limit”.',
   },
 };
 
 const TIMES = [
   { h: 8, label: '8 AM', note: 'Both taken' },
-  { h: 10, label: '10 AM', note: 'Effect starts' },
-  { h: 12, label: '12 PM', note: 'Strongest' },
-  { h: 18, label: '6 PM', note: 'Wearing off' },
+  { h: 12, label: '12 PM', note: 'Sugar rising' },
+  { h: 15, label: '3 PM', note: 'Highest' },
+  { h: 21, label: '9 PM', note: 'Settling' },
 ];
 
 const TIME_ADVICE: Record<number, string> = {
   8: 'You took both medicines with breakfast.',
-  10: 'You may start to feel sleepy. Avoid driving if you do.',
-  12: 'Drowsiness is usually strongest now. Don’t drive or operate machinery.',
-  18: 'The effect is wearing off, but take it easy if you still feel drowsy.',
+  12: 'Prednisolone starts pushing your blood sugar up. Check it before lunch if you can.',
+  15: 'Blood sugar is usually highest in the afternoon. Go easy on rice and sweets at lunch.',
+  21: 'The effect is settling. Keep checking your sugar until the course of Prednisolone ends.',
 };
 
 const EAT = [
@@ -77,7 +76,7 @@ const EAT = [
 ];
 
 const LIMIT = [
-  { name: 'Pani puri and fried snacks', note: 'Can worsen acidity' },
+  { name: 'Pani puri and fried snacks', note: 'Hard on an upset stomach' },
   { name: 'Sweets and sugary drinks', note: 'Raise blood sugar quickly' },
 ];
 
@@ -86,7 +85,7 @@ export default function SectionAppShowcase() {
   const [taken, setTaken] = useState<Record<string, boolean>>({});
   const [toast, setToast] = useState<string | null>(null);
   const [openEntry, setOpenEntry] = useState<string | null>('1');
-  const [hour, setHour] = useState(12);
+  const [hour, setHour] = useState(15);
   const [dietTab, setDietTab] = useState<'eat' | 'limit'>('eat');
 
   useEffect(() => {
@@ -96,8 +95,8 @@ export default function SectionAppShowcase() {
   }, [toast]);
 
   const doses = [
-    { id: 'med1', name: 'Cetirizine 10mg', time: '9:30 AM · after food' },
-    { id: 'med2', name: 'Pantoprazole 40mg', time: '2:00 PM · 30 min before lunch' },
+    { id: 'med1', name: 'Metformin 500mg', time: '8:30 AM · after breakfast' },
+    { id: 'med2', name: 'Prednisolone 10mg', time: '8:30 AM · day 2 of 5' },
   ];
   const takenCount = doses.filter((d) => taken[d.id]).length;
   const pct = Math.round((takenCount / doses.length) * 100);
@@ -115,10 +114,10 @@ export default function SectionAppShowcase() {
   return (
     <section id="app-showcase" className="relative py-16 md:py-20 px-6 md:px-12 bg-bg-warm border-t border-border-light">
       <div className="max-w-7xl mx-auto space-y-10">
-        <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-primary-text tracking-tight">The everyday app.</h2>
+        <div className="text-left space-y-3 max-w-2xl">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-primary-text tracking-tight">The everyday app</h2>
           <p className="text-base sm:text-lg text-secondary-text leading-relaxed">
-            Medicines, reminders, history and diet — the screens you'll use most. Tap around, they work.
+            The screens you'll open most: medicines, history, interaction checks and diet. You can tap through them here.
           </p>
         </div>
 
@@ -186,22 +185,26 @@ export default function SectionAppShowcase() {
                     <>
                       <div className="flex justify-between items-center">
                         <div>
-                          <p className="text-base font-bold text-primary-text">Good evening, Abhay</p>
+                          <p className="text-base font-bold text-primary-text">Good evening, Rahul</p>
                           <p className="text-[11px] text-secondary-text">Tuesday, 9 June</p>
                         </div>
                         <div className="flex items-center gap-3">
                           <Bell className="w-4 h-4 text-primary-text" aria-hidden="true" />
                           <span className="w-8 h-8 rounded-full bg-teal-100 text-teal-800 flex items-center justify-center text-xs font-bold" aria-hidden="true">
-                            A
+                            R
                           </span>
                         </div>
                       </div>
 
-                      <div className="bg-accent-soft border border-emerald-100 rounded-2xl p-3 space-y-2">
-                        <p className="text-xs font-bold text-accent-emerald flex items-center gap-1.5">
-                          <ShieldCheck className="w-4 h-4" aria-hidden="true" />
-                          No serious interactions in your medicines
-                        </p>
+                      <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 space-y-2">
+                        <button
+                          onClick={() => setScreen('interaction')}
+                          className="w-full text-xs font-bold text-amber-900 flex items-center gap-1.5 text-left hover:underline"
+                        >
+                          <ShieldAlert className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                          <span className="flex-1">1 combination to watch: Metformin + Prednisolone</span>
+                          <ChevronRight className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                        </button>
                         <div className="space-y-1">
                           <div className="flex justify-between text-[11px]">
                             <span className="text-secondary-text">Today</span>
@@ -294,7 +297,7 @@ export default function SectionAppShowcase() {
                             when: 'Today, 10:30 AM',
                             title: 'Loose motions',
                             text: 'Loose motions and stomach cramps after eating street food.',
-                            advice: ['Drink ORS through the day', 'Keep taking Pantoprazole before meals', 'See a doctor if there is blood or high fever'],
+                            advice: ['Drink ORS through the day', 'Take Metformin only after food; ask a doctor if you can’t eat', 'See a doctor if there is blood or high fever'],
                           },
                           {
                             id: '2',
@@ -355,8 +358,8 @@ export default function SectionAppShowcase() {
                       <p className="text-base font-bold text-primary-text">Interaction check</p>
                       <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 space-y-1.5 text-center">
                         <span className="inline-block px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 font-bold text-[11px]">Moderate</span>
-                        <p className="text-sm font-bold text-primary-text">Cetirizine + Alprazolam</p>
-                        <p className="text-xs text-amber-900">Taking these together can make you much sleepier than usual.</p>
+                        <p className="text-sm font-bold text-primary-text">Metformin + Prednisolone</p>
+                        <p className="text-xs text-amber-900">Prednisolone can raise your blood sugar while you are taking it.</p>
                       </div>
 
                       <div className="p-3 rounded-xl bg-bg-warm border border-border-light space-y-1">
@@ -364,7 +367,7 @@ export default function SectionAppShowcase() {
                           <Info className="w-4 h-4 text-accent-emerald" aria-hidden="true" />
                           Why
                         </p>
-                        <p className="text-xs text-secondary-text leading-snug">Both medicines cause drowsiness. Together, the effect adds up and can slow your reactions.</p>
+                        <p className="text-xs text-secondary-text leading-snug">Steroids like Prednisolone raise blood sugar, so your usual Metformin dose may not keep it in range during the course.</p>
                       </div>
 
                       <div className="p-3 rounded-xl bg-bg-warm border border-border-light space-y-2">
@@ -392,10 +395,10 @@ export default function SectionAppShowcase() {
                       <div className="p-3 rounded-xl bg-red-50 border border-red-200 space-y-1.5">
                         <p className="text-xs font-bold text-accent-red flex items-center gap-1.5">
                           <AlertTriangle className="w-4 h-4" aria-hidden="true" />
-                          Get help right away if you have
+                          Call your doctor if you have
                         </p>
                         <div className="flex flex-wrap gap-1">
-                          {['Trouble breathing', 'Extreme drowsiness', 'Confusion'].map((s) => (
+                          {['Sugar above 300 mg/dL', 'Extreme thirst', 'Confusion'].map((s) => (
                             <span key={s} className="bg-white px-2 py-0.5 rounded border border-red-200 text-accent-red text-[11px] font-medium">
                               {s}
                             </span>
@@ -410,9 +413,9 @@ export default function SectionAppShowcase() {
                     <>
                       <div className="flex justify-between items-center">
                         <p className="text-base font-bold text-primary-text">Diet plan</p>
-                        <span className="text-[11px] font-semibold text-secondary-text bg-bg-warm border border-border-light px-2 py-0.5 rounded-full">Acidity · Loose motions</span>
+                        <span className="text-[11px] font-semibold text-secondary-text bg-bg-warm border border-border-light px-2 py-0.5 rounded-full">Diabetes · Loose motions</span>
                       </div>
-                      <p className="text-xs text-secondary-text">Based on your 2 medicines and current symptoms.</p>
+                      <p className="text-xs text-secondary-text">Based on your diabetes, your medicines and today’s symptoms.</p>
 
                       <div className="bg-bg-warm p-1 rounded-xl border border-border-light flex text-xs font-bold text-secondary-text" role="group" aria-label="Diet list">
                         <button

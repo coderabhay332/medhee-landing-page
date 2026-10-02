@@ -36,11 +36,11 @@ export async function generateMetadata({
   const description = cleanText(article.metaDescription || article.summary).slice(0, 160);
   const canonical = `/drugs/${article.slug}`;
   return {
-    title: `${article.drugName} — Uses, Dosage, Side Effects & Interactions`,
+    title: `${article.drugName}: Uses, Dosage, Side Effects & Interactions`,
     description,
     alternates: { canonical },
     openGraph: {
-      title: `${article.drugName} — Medication Guide | Medhee`,
+      title: `${article.drugName} Medication Guide | Medhee`,
       description,
       url: `https://medhee.com${canonical}`,
       type: 'article',

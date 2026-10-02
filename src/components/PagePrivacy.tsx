@@ -11,7 +11,7 @@ const PRIMARY = '#2260FF';
 
 export default function PagePrivacy() {
   useEffect(() => {
-    document.title = 'Privacy Policy — Medhee';
+    document.title = 'Privacy Policy | Medhee';
   }, []);
   return (
     <div className="min-h-screen bg-white font-sans">
@@ -83,7 +83,7 @@ export default function PagePrivacy() {
           {
             title: '5. Third-Party Services',
             body:
-              'Medhee uses the following trusted sub-processors: Google Cloud (infrastructure), Cloudinary (image processing — files deleted post-extraction), Expo (mobile build & update delivery), and LiveKit (encrypted video consultations). Each sub-processor is bound by data processing agreements.',
+              'Medhee uses the following trusted sub-processors: Google Cloud (infrastructure), Cloudinary (image processing; files are deleted after extraction), Expo (mobile build & update delivery), and LiveKit (encrypted video consultations). Each sub-processor is bound by data processing agreements.',
           },
           {
             title: '6. Children\'s Privacy',

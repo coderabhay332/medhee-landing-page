@@ -25,7 +25,7 @@ export async function generateMetadata({
   const canonical = `/drugs/category/${category}`;
   const description = `Browse ${found.drugs.length} ${found.name} medications with plain-language guides on uses, dosage, side effects, and interactions.`;
   return {
-    title: `${found.name} Medications — Drug Guides`,
+    title: `${found.name} Medications: Drug Guides`,
     description,
     alternates: { canonical },
     openGraph: {
@@ -105,7 +105,7 @@ export default async function CategoryPage({
             </div>
             <h1 className="font-display text-4xl font-bold tracking-tight sm:text-5xl">{found.name} medications</h1>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-secondary-text md:text-lg">
-              Plain-language guides for {found.name.toLowerCase()} medicines — uses, dosage, side effects, precautions, and interactions.
+              Plain-language guides for {found.name.toLowerCase()} medicines: uses, dosage, side effects, precautions, and interactions.
             </p>
 
             {/* Category chips: internal links between hubs strengthen crawl paths. */}
