@@ -159,11 +159,11 @@ export async function getAllDrugSitemapEntries(): Promise<Array<{ slug: string; 
   const entries: Array<{ slug: string; dateModified: string | null }> = [];
   let lastKey: Record<string, unknown> | undefined;
   do {
+    // The status GSI does not project `dateModified`, so read it from the base table.
     const res = await doc.send(
-      new QueryCommand({
+      new ScanCommand({
         TableName: TABLE,
-        IndexName: STATUS_GSI,
-        KeyConditionExpression: 'pubStatus = :s',
+        FilterExpression: 'pubStatus = :s',
         ExpressionAttributeValues: { ':s': PUB_STATUS },
         ProjectionExpression: 'slug, dateModified',
         ExclusiveStartKey: lastKey,
