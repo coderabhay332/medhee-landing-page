@@ -151,6 +151,34 @@ export async function getAllDrugSlugs(): Promise<string[]> {
   return slugs;
 }
 
+/**
+ * Slug + last-modified date for every published drug — feeds the sitemap so
+ * `lastmod` reflects real content changes instead of the request time.
+ */
+export async function getAllDrugSitemapEntries(): Promise<Array<{ slug: string; dateModified: string | null }>> {
+  const entries: Array<{ slug: string; dateModified: string | null }> = [];
+  let lastKey: Record<string, unknown> | undefined;
+  do {
+    const res = await doc.send(
+      new QueryCommand({
+        TableName: TABLE,
+        IndexName: STATUS_GSI,
+        KeyConditionExpression: 'pubStatus = :s',
+        ExpressionAttributeValues: { ':s': PUB_STATUS },
+        ProjectionExpression: 'slug, dateModified',
+        ExclusiveStartKey: lastKey,
+      }),
+    );
+    for (const item of res.Items ?? []) {
+      if (item.slug) {
+        entries.push({ slug: String(item.slug), dateModified: (item.dateModified as string) ?? null });
+      }
+    }
+    lastKey = res.LastEvaluatedKey as Record<string, unknown> | undefined;
+  } while (lastKey);
+  return entries;
+}
+
 /** Alphabetical list of all published drugs (paged through the GSI). */
 export async function getAllDrugs(): Promise<DrugListItem[]> {
   const items: DrugListItem[] = [];

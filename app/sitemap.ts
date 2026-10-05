@@ -1,33 +1,39 @@
 import type { MetadataRoute } from 'next';
-import { getAllCategories, getAllDrugSlugs } from '@/lib/drugs';
+import { getAllCategories, getAllDrugSitemapEntries } from '@/lib/drugs';
 
 const SITE = 'https://medhee.com';
 
+// Static pages change rarely; bump these when the page content is edited.
+const HOME_LAST_MODIFIED = new Date('2026-10-05');
+const LEGAL_LAST_MODIFIED = new Date('2026-07-23');
+
 export const revalidate = 86400;
 
+/** Parse a stored date string; undefined if missing/invalid so `lastmod` is omitted rather than wrong. */
+function toDate(value: string | null): Date | undefined {
+  if (!value) return undefined;
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? undefined : d;
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [slugs, categories] = await Promise.all([getAllDrugSlugs(), getAllCategories()]);
-  const now = new Date();
+  const [drugs, categories] = await Promise.all([getAllDrugSitemapEntries(), getAllCategories()]);
 
   const staticRoutes: MetadataRoute.Sitemap = [
-    { url: `${SITE}/`, lastModified: now, changeFrequency: 'weekly', priority: 1 },
-    { url: `${SITE}/drugs`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
-    { url: `${SITE}/privacy`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
-    { url: `${SITE}/terms`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${SITE}/`, lastModified: HOME_LAST_MODIFIED },
+    { url: `${SITE}/drugs`, lastModified: HOME_LAST_MODIFIED },
+    { url: `${SITE}/privacy`, lastModified: LEGAL_LAST_MODIFIED },
+    { url: `${SITE}/terms`, lastModified: LEGAL_LAST_MODIFIED },
   ];
 
   const categoryRoutes: MetadataRoute.Sitemap = categories.map((c) => ({
     url: `${SITE}/drugs/category/${c.slug}`,
-    lastModified: now,
-    changeFrequency: 'weekly',
-    priority: 0.8,
+    lastModified: HOME_LAST_MODIFIED,
   }));
 
-  const drugRoutes: MetadataRoute.Sitemap = slugs.map((slug) => ({
+  const drugRoutes: MetadataRoute.Sitemap = drugs.map(({ slug, dateModified }) => ({
     url: `${SITE}/drugs/${slug}`,
-    lastModified: now,
-    changeFrequency: 'monthly',
-    priority: 0.7,
+    lastModified: toDate(dateModified),
   }));
 
   return [...staticRoutes, ...categoryRoutes, ...drugRoutes];

@@ -49,6 +49,5 @@ export default function robots(): MetadataRoute.Robots {
       ...BLOCKED_BOTS.map((bot) => ({ userAgent: bot, disallow: '/' })),
     ],
     sitemap: 'https://medhee.com/sitemap.xml',
-    host: 'https://medhee.com',
   };
 }

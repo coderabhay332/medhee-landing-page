@@ -134,6 +134,11 @@ export default async function DrugDetailPage({
     url: pageUrl,
     datePublished: article.datePublished || undefined,
     dateModified: article.dateModified || undefined,
+    lastReviewed: article.dateModified || undefined,
+    inLanguage: 'en',
+    isPartOf: { '@id': 'https://medhee.com/#website' },
+    ...(article.sourceUrl ? { citation: article.sourceUrl } : {}),
+    author: { '@type': 'Organization', name: 'Medhee', url: 'https://medhee.com' },
     publisher: { '@type': 'Organization', name: 'Medhee', url: 'https://medhee.com' },
     about: {
       '@type': 'Drug',
@@ -395,6 +400,35 @@ export default async function DrugDetailPage({
               </div>
             </section>
           )}
+
+          {/* Verifiable references — lets readers (and Google) cross-check the guide against official sources. */}
+          <section id="sources" className="mt-12 scroll-mt-24 rounded-3xl border border-border-light bg-white p-6 md:p-8">
+            <p className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-accent-emerald">Verify this information</p>
+            <h2 className="mt-2 font-display text-2xl font-bold">Sources &amp; references</h2>
+            <p className="mt-3 text-sm leading-7 text-secondary-text">
+              Always check current prescribing information for {article.drugName}. Official references:
+            </p>
+            <ul className="mt-4 space-y-2 text-sm">
+              {article.sourceUrl && (
+                <li>
+                  <a href={article.sourceUrl} target="_blank" rel="noopener noreferrer nofollow" className="font-medium text-accent-emerald underline underline-offset-4">
+                    Original source material for this guide
+                  </a>
+                </li>
+              )}
+              <li>
+                <a href={`https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=${encodeURIComponent(article.genericName || article.drugName)}`} target="_blank" rel="noopener noreferrer" className="font-medium text-accent-emerald underline underline-offset-4">
+                  DailyMed: official FDA drug labels for {article.genericName || article.drugName}
+                </a>
+              </li>
+              <li>
+                <a href={`https://medlineplus.gov/search/?query=${encodeURIComponent(article.genericName || article.drugName)}`} target="_blank" rel="noopener noreferrer" className="font-medium text-accent-emerald underline underline-offset-4">
+                  MedlinePlus (U.S. National Library of Medicine): {article.genericName || article.drugName}
+                </a>
+              </li>
+            </ul>
+            {article.dateModified && <p className="mt-4 font-mono text-xs text-secondary-text">Content last reviewed {article.dateModified}</p>}
+          </section>
 
           <aside className="mt-12 rounded-3xl bg-surface-dark p-6 text-white md:p-8">
             <div className="flex items-start gap-4">

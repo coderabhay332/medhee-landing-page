@@ -9,7 +9,11 @@ import SectionAILimits from '@/src/components/SectionAILimits';
 import SectionDashboard from '@/src/components/SectionDashboard';
 import SectionTrust from '@/src/components/SectionTrust';
 import SectionVision from '@/src/components/SectionVision';
+import SectionBrowseMedicines from '@/src/components/SectionBrowseMedicines';
 import SectionFooter from '@/src/components/SectionFooter';
+
+// Refresh daily so the medicine links stay current (ISR).
+export const revalidate = 86400;
 
 export default function HomePage() {
   return (
@@ -26,6 +30,7 @@ export default function HomePage() {
         <SectionAILimits />
         <SectionTrust />
         <SectionVision />
+        <SectionBrowseMedicines />
         <SectionFooter />
       </main>
     </div>
