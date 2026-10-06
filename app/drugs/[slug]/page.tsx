@@ -146,12 +146,9 @@ export default async function DrugDetailPage({
       ...(article.genericName ? { nonProprietaryName: article.genericName } : {}),
       ...(article.brandName ? { alternateName: article.brandName } : {}),
       ...(article.primaryCategory ? { drugClass: article.primaryCategory } : {}),
-      ...(interactionWarning
-        ? {
-            warning: interactionWarning,
-            interactingDrug: article.interactions.map((i) => ({ '@type': 'Drug', name: i.agent })),
-          }
-        : {}),
+      // Interaction "agents" are often drug classes (e.g. "SSRIs"), not single drugs, and
+      // Search Console flags nested Drug entities as missing offers/ratings — so keep this as text.
+      ...(interactionWarning ? { warning: interactionWarning } : {}),
     },
   };
 
