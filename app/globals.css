@@ -29,6 +29,13 @@
     overflow-x: hidden;
   }
 
+  /* Tailwind v4 removed the default `cursor: pointer` on buttons. Restore the
+     v3 behavior so interactive controls show the hand cursor on hover. */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
   /* Smooth scroll support */
   html {
     scroll-behavior: smooth;
@@ -63,4 +70,25 @@
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+
+/* Guide mascot: keep tour targets clear of the fixed navbar, and highlight
+   the element the current tour step is about. */
+[data-mascot] {
+  scroll-margin-top: 6rem;
+  scroll-margin-bottom: 7rem;
+}
+[data-mascot-highlight] {
+  outline: 3px solid rgba(13, 148, 136, 0.55);
+  outline-offset: 6px;
+  border-radius: 1rem;
+  animation: mascot-pulse 1.6s ease-in-out infinite;
+}
+@keyframes mascot-pulse {
+  0%, 100% { outline-color: rgba(13, 148, 136, 0.55); }
+  50% { outline-color: rgba(13, 148, 136, 0.15); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-mascot-highlight] { animation: none; }
 }
